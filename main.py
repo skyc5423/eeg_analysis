@@ -9,7 +9,7 @@ from y_report_analysis import YReportAnalysis
 import tf_model
 import constants
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 def make_compare_analysis(crt_ytdf_file, crt_edf_data, info_crt, cmp_ytdf_file, cmp_edf_data, info_cmp, request_id, language='Korean', model=None):
@@ -43,6 +43,7 @@ def make_single_analysis(crt_ytdf_file, crt_edf_data, request_id, info_crt, lang
         for_eeg = False
         cdf_dict = None
         raw_data_dict = None
+        return
     else:
         for_eeg = True
         if not DEBUG_MODE:
@@ -116,7 +117,7 @@ def analysis_eeg(info, crt_file_name, cmp_file_name=None, language='Korean', mod
 
 def main():
     for fn in os.listdir('./testdata/'):
-        if fn.endswith('20210727-110725.edf'):
+        if fn.startswith('0000') and fn.endswith('.edf'):
             print(fn)
             try:
                 analysis_eeg(TEST_INFO, os.path.join('./testdata/', fn), language='Korean', model=tf_model.default())
