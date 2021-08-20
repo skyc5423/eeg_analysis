@@ -116,13 +116,14 @@ def analysis_eeg(info, crt_file_name, cmp_file_name=None, language='Korean', mod
 
 
 def main():
-    for fn in os.listdir('./testdata/'):
-        if fn.startswith('0000') and fn.endswith('.edf'):
-            print(fn)
-            try:
-                analysis_eeg(TEST_INFO, os.path.join('./testdata/', fn), language='Korean', model=tf_model.default())
-            except:
-                print("%s failed" % fn)
+    for label in os.listdir('./testdata/raw'):
+        for fn in os.listdir('./testdata/raw/' + label):
+            if fn.endswith('.edf'):
+                print(os.path.join('./testdata/raw', label, fn))
+                try:
+                    analysis_eeg(TEST_INFO, './testdata/raw/' + label + '/' + fn, language='Korean', model=tf_model.default())
+                except:
+                    print("%s failed" % fn)
 
 
 if __name__ == '__main__':
