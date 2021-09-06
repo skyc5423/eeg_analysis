@@ -582,13 +582,13 @@ class Constants():
     PSD_DESC_TEXT_SIZE = 40
     PSD_DESC_TEXT_COLOR = Y_BLACK_TEXT
 
-    PSD_MEAN_IMG = './%s/%s_mean_psd.png'
+    PSD_MEAN_IMG = '%s_mean_psd.png'
     PSD_MEAN_IMG_X = 531
     PSD_MEAN_IMG_Y = 930
     PSD_MEAN_IMG_W = 1400
     PSD_MEAN_IMG_H = 875
 
-    PSD_CHANNEL_IMG = './%s/%s_channel_psd.png'
+    PSD_CHANNEL_IMG = '%s_channel_psd.png'
     PSD_CHANNEL_IMG_X = 356
     PSD_CHANNEL_IMG_Y = 1700
     PSD_CHANNEL_IMG_W = 1750
@@ -613,9 +613,9 @@ class Constants():
     PEAK_DESC_TEXT_SIZE = 40
     PEAK_DESC_TEXT_COLOR = Y_BLACK_TEXT
 
-    PEAK_O1_IMG = './%s/crt_alpha_peak_ch_15.png'
+    PEAK_O1_IMG = 'crt_alpha_peak_ch_15.png'
     PEAK_O1_IMG_X = 135
-    PEAK_O2_IMG = './%s/crt_alpha_peak_ch_11.png'
+    PEAK_O2_IMG = 'crt_alpha_peak_ch_11.png'
     PEAK_O2_IMG_X = 1300
     PEAK_IMG_Y = 960
     PEAK_IMG_W = 1180

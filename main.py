@@ -8,8 +8,13 @@ from analysis import make_analysis, make_analysis_fake
 from y_report_analysis import YReportAnalysis
 import tf_model
 import constants
-
-DEBUG_MODE = False
+import argparse
+import sys
+from config.cfg import cfg
+import config.cfg as config
+from tqdm import tqdm
+from pathlib import Path
+from warnings import simplefilter
 
 
 def make_compare_analysis(crt_ytdf_file, crt_edf_data, info_crt, cmp_ytdf_file, cmp_edf_data, info_cmp, request_id, language='Korean', model=None):
@@ -46,7 +51,7 @@ def make_single_analysis(crt_ytdf_file, crt_edf_data, request_id, info_crt, lang
         return
     else:
         for_eeg = True
-        if not DEBUG_MODE:
+        if not cfg.DEBUG_MODE:
             art_removed_custom_raw = make_epoch_custom_raw(crt_ytdf_file, data_edf=crt_edf_data, request_id=request_id, crt_prefix='crt', model=model)
             cdf_dict, raw_data_dict = make_analysis(art_removed_custom_raw=art_removed_custom_raw,
                                                     request_id=request_id,
@@ -55,7 +60,7 @@ def make_single_analysis(crt_ytdf_file, crt_edf_data, request_id, info_crt, lang
                                                     age=age)
         else:
             cdf_dict, raw_data_dict = make_analysis_fake()
-    os.makedirs(str(request_id), exist_ok=True)
+
     return make_indiv_report(request_id, info_crt, language=language, for_eeg=for_eeg, cdf_dict=cdf_dict,
                              raw_data_dict=raw_data_dict)
 
@@ -78,9 +83,14 @@ def make_indiv_report(request_id, info, cdf_dict, raw_data_dict, language='Korea
 
 
 def indiv_analysis_eeg(info, crt_file_name, language='Korean', model=None):
-    info['anlzRequest']['id'] = crt_file_name.split('/')[-1].split('.')[0]
+    info['anlzRequest']['id'] = crt_file_name.split('.')[0]
     request_id = str(info["anlzRequest"]["id"])
-    if DEBUG_MODE:
+
+    if not cfg.DUPLICATE:
+        if Path(cfg.OUT_DIR, request_id).exists():
+            raise Exception('Already exists: %s' % (Path(cfg.OUT_DIR, request_id)))
+
+    if cfg.DEBUG_MODE:
         crt_ytdf_ref_file = None
         crt_edf_data = {}
         crt_edf_data['data'] = np.array([])
@@ -96,7 +106,7 @@ def indiv_analysis_eeg(info, crt_file_name, language='Korean', model=None):
 
 
 def comp_analysis_eeg(info, crt_file_name, cmp_file_name, language='Korean', model=None):
-    info['anlzRequest']['id'] = crt_file_name.split('/')[-1].split('.')[0]
+    info['anlzRequest']['id'] = crt_file_name.split('.')[0]
     request_id = str(info["anlzRequest"]["id"])
 
     crt_ytdf_ref_file, crt_edf_data = read_file(info, crt_file_name)
@@ -107,24 +117,70 @@ def comp_analysis_eeg(info, crt_file_name, cmp_file_name, language='Korean', mod
                           info_crt=info, info_cmp=info, language=language, model=model)
 
 
-def analysis_eeg(info, crt_file_name, cmp_file_name=None, language='Korean', model=None):
-    if cmp_file_name is None:
-        indiv_analysis_eeg(info, crt_file_name, language, model)
+def analysis_eeg(info, crt_file_name, language='Korean', model=None):
+    indiv_analysis_eeg(info, crt_file_name, language, model)
 
+
+def compare_eeg(info, crt_file_name, cmp_file_name, language='Korean', model=None):
+    comp_analysis_eeg(info, crt_file_name, cmp_file_name, language, model)
+
+
+def gather_file(path_dir, total_file_list):
+    for file_name in os.listdir(path_dir):
+        if os.path.isdir(os.path.join(path_dir, file_name)):
+            gather_file(os.path.join(path_dir, file_name), total_file_list)
+        else:
+            if (lambda s: s in os.path.join(path_dir, file_name))('.edf'):
+                total_file_list.append(os.path.join(path_dir, file_name))
+
+
+def parse_file_list(source_path):
+    file_list = []
+    if Path(source_path).is_dir():
+        gather_file(source_path, file_list)
     else:
-        comp_analysis_eeg(info, crt_file_name, cmp_file_name, language, model)
+        file_list.append(source_path)
+    return file_list
 
 
 def main():
-    for label in os.listdir('./testdata/raw'):
-        for fn in os.listdir('./testdata/raw/' + label):
-            if fn.endswith('.edf'):
-                print(os.path.join('./testdata/raw', label, fn))
-                try:
-                    analysis_eeg(TEST_INFO, './testdata/raw/' + label + '/' + fn, language='Korean', model=tf_model.default())
-                except:
-                    print("%s failed" % fn)
+    simplefilter(action='ignore', category=DeprecationWarning)
+
+    parser = argparse.ArgumentParser(description='eeg file analysis.')
+    parser.add_argument('--mode', type=str, choices=['analysis', 'compare'], help='Select mode')
+    parser.add_argument('--path', type=str, help='file or folder directory')
+    parser.add_argument('--old_path', type=str, help='older file path only for compare mode')
+    parser.add_argument('--config', type=str, default='./config/config_file.yaml', help='path to configure file')
+    parser.add_argument("opts", default=None, nargs=argparse.REMAINDER, help='remainder arguments')
+    args = parser.parse_args()
+
+    config.load_cfg(args.config)
+    cfg.merge_from_list(args.opts)
+    config.assert_cfg()
+    cfg.freeze()
+
+    if args.mode == 'analysis':
+        print("Analysis starts")
+        for src_path in tqdm(parse_file_list(args.path)):
+            try:
+                print("%s starts" % src_path)
+                analysis_eeg(TEST_INFO, src_path, language=cfg.LANGUAGE, model=tf_model.default())
+            except Exception as instance:
+                inst_message = instance.args[0]
+                print("%s failed: %s" % (src_path, inst_message))
+    elif args.mode == 'compare':
+        print("Compare analysis starts")
+        try:
+            print("%s vs %s starts" % (args.path, args.old_path))
+            compare_eeg(TEST_INFO, args.path, args.old_path, language=cfg.LANGUAGE, model=tf_model.default())
+        except Exception as instance:
+            inst_message = instance.args[0]
+            print("%s vs %s failed: %s" % (args.path, args.old_path, inst_message))
+        pass
 
 
 if __name__ == '__main__':
+    # sys.argv = ['main.py', '--mode', 'analysis', '--path', 'testdata', 'OUT_DIR', 'output', 'PREPROCESS', 'True', 'DEBUG_MODE', 'False']
+    sys.argv = ['main.py', '--mode', 'compare', '--path', '0000-김나경-20210315-094123.edf', '--old_path', '+616-지익상-20210510-144115.edf', 'OUT_DIR', 'output', 'DEBUG_MODE',
+                'True']
     main()

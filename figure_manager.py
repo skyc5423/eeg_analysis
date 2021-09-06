@@ -13,6 +13,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from PIL import Image
 import matplotlib.font_manager as fm
 from matplotlib.ticker import FormatStrFormatter
+from pathlib import Path
+from config.cfg import cfg
 
 
 def custom_color_map_blue_red(value=None):
@@ -64,6 +66,8 @@ def make_head_outline(ax, outlines):
 
 
 def plot_topo_map(powers, pos, outlines, request_id, crt_prefix, feature, is_stretch, head_pos=None, labelsize=25):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     for band in powers.keys():
         pos, outlines = _check_outlines(pos, outlines, head_pos)
         _, ax = plt.subplots(1, 1, figsize=(7.5, 5))
@@ -100,12 +104,10 @@ def plot_topo_map(powers, pos, outlines, request_id, crt_prefix, feature, is_str
         cax = divider.append_axes('right', size='10%', pad=0.5)
         cbar = ax.figure.colorbar(im, cax=cax, cmap=custom_color_map_blue_red(), orientation='vertical', pad=10.)
         cbar.set_ticks([-3, -2, -1, 0, 1, 2, 3])
-        # cbar.set_yticklabels([mn, md, mx])
         cbar.ax.tick_params(labelsize=labelsize,
                             direction='in', length=8)
         ax.scatter(pos[:, 0], pos[:, 1], color='black')
-        # cbar.set_label('z-score', fontsize=25, rotation=270)
-        ax.figure.savefig(request_id + "/" + crt_prefix + '_' + feature + '_' + band + ".png")
+        ax.figure.savefig(path_fig / Path(crt_prefix + '_' + feature + '_' + band + ".png"))
         plt.close(ax.figure)
 
 
@@ -142,18 +144,18 @@ def plot_ica_topomap(power, pos, outlines, idx, crt_prefix, request_id, sign):
     for ch in range(19):
         ax.plot(pos_[ch, 0] * 1.15, pos_[ch, 1] * 1.15, 'r', marker='o', markersize=2)
 
-    os.makedirs(str(request_id), exist_ok=True)
-
-    fig_path = os.path.join(request_id, "%s_ica_sources_%d_%d.png" % (crt_prefix, idx + 1, sign))
-    ax.figure.savefig(fig_path)
-
+    fig_path = Path(cfg.OUT_DIR, request_id)
+    fig_path.mkdir(exist_ok=True, parents=True)
+    ax.figure.savefig(fig_path / Path("%s_ica_sources_%d_%d.png" % (crt_prefix, idx + 1, sign)))
     rtn_tmp = np.array(ax.figure.canvas.renderer._renderer)
-
     plt.close(fig)
+
     return rtn[:, :, 0:3] / 255., rtn_tmp[:, :, 0:3] / 255.
 
 
 def information_speed(score, request_id, crt_prefix, language='Korean'):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     if language == 'Korean':
         font_location = './font/NanumSquareBold.ttf'
         fontprop = fm.FontProperties(fname=font_location)
@@ -233,11 +235,13 @@ def information_speed(score, request_id, crt_prefix, language='Korean'):
     npa = fig.canvas.renderer._renderer
     tmp = np.array(npa)
     img = Image.fromarray(tmp[40:280, 100:-100])
-    img.save('%s/%s_info_speed.png' % (request_id, crt_prefix))
+    img.save(path_fig / Path('%s_info_speed.png' % (crt_prefix)))
     plt.close(fig)
 
 
 def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, language='Korean'):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     if language == 'Korean':
         font_location = './font/NanumSquareBold.ttf'
         fontprop = fm.FontProperties(fname=font_location)
@@ -310,11 +314,13 @@ def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, la
     npa = fig.canvas.renderer._renderer
     tmp = np.array(npa)
     img = Image.fromarray(tmp[50:])
-    img.save('%s/%s_info_amount_complexity.png' % (request_id, crt_prefix))
+    img.save(path_fig / Path('%s_info_amount_complexity.png' % (crt_prefix)))
     plt.close(fig)
 
 
 def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     im1 = Image.open('img/brain-top-outline.png')
     im2 = Image.open('img/brain-top-fill.png')
     im1 = im1.resize((im2.size[0] + 2, im2.size[1] + 5))
@@ -344,11 +350,14 @@ def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix):
     npa = fig.canvas.renderer._renderer
     tmp = np.array(npa)
     img = Image.fromarray(tmp[:, 250:-140])
-    img.save('%s/%s_hemispheric_connectivity.png' % (request_id, crt_prefix))
+    img.save(path_fig / Path('%s_hemispheric_connectivity.png' % (crt_prefix)))
     plt.close(fig)
 
 
 def use_of_brain(score_brain_use, request_id, crt_prefix):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
+
     im1 = Image.open('./img/brain-side-outline.png')
     im2 = Image.open('./img/brain-side-fill.png')
     im1 = im1.resize((im2.size[0] + 2, im2.size[1] + 5))
@@ -378,11 +387,14 @@ def use_of_brain(score_brain_use, request_id, crt_prefix):
     npa = fig.canvas.renderer._renderer
     tmp = np.array(npa)
     img = Image.fromarray(tmp[:, 250:-140])
-    img.save('%s/%s_brain_use.png' % (request_id, crt_prefix))
+    img.save(path_fig / Path('%s_brain_use.png' % (crt_prefix)))
     plt.close(fig)
 
 
 def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
+
     if language == 'Korean':
         font_location = './font/NanumSquareBold.ttf'
         fontprop = fm.FontProperties(fname=font_location)
@@ -475,11 +487,13 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
     npa = fig.canvas.renderer._renderer
     tmp = np.array(npa)
     img = Image.fromarray(tmp[30:150, 50:-50])
-    img.save(request_id + "/" + crt_prefix + '_' + index_type + ".png")
+    img.save(path_fig / Path(crt_prefix + '_' + index_type + ".png"))
     plt.close(fig)
 
 
 def memory_operate(alpha_score, request_id, crt_prefix):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     font_location = './font/NanumSquareBold.ttf'
     fontprop = fm.FontProperties(fname=font_location)
     level_define_var = ['매우낮음', '낮음', '표준', '높음', '매우높음']
@@ -544,11 +558,13 @@ def memory_operate(alpha_score, request_id, crt_prefix):
     npa = fig.canvas.renderer._renderer
     tmp = np.array(npa)
     img = Image.fromarray(tmp[170:-20, 80:-80])
-    img.save('%s/%s_memory_operate.png' % (request_id, crt_prefix))
+    img.save(path_fig / Path('%s_memory_operate.png' % (crt_prefix)))
     plt.close(fig)
 
 
 def SEF_psd_plot(f, p, alpha_peak_freq, SEF_95_freq, request_id, crt_prefix):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(1, 1, figsize=(8, 4.5))
     ax.plot(f, 20 * np.log(p + 10E-3), color='#b5b5bc')
     ax.set_xlim(0, 60)
@@ -570,13 +586,16 @@ def SEF_psd_plot(f, p, alpha_peak_freq, SEF_95_freq, request_id, crt_prefix):
     ax.spines['top'].set_visible(False)
     ax.spines['left'].set_color('#eaeaea')
     ax.spines['bottom'].set_color('#eaeaea')
-    fig.savefig('%s/%s_psd_sef.png' % (request_id, crt_prefix))
+    fig.savefig(path_fig / Path('%s_psd_sef.png' % (crt_prefix)))
     plt.close(fig)
 
 
 # fixme : it takes too long : 8.5
 def alpha_peak_plot(psd, alpha_peak, alpha_peak_power, sfreq, request_id, crt_prefix, pos, outlines='head',
                     head_pos=None):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
+
     for ch in range(19):
         tmp_peak = alpha_peak[ch]
         tmp_power = alpha_peak_power[ch]
@@ -598,7 +617,8 @@ def alpha_peak_plot(psd, alpha_peak, alpha_peak_power, sfreq, request_id, crt_pr
         ax.get_yaxis().set_ticks([-140, -120, -100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100, 120, 140])
         ax.set_ylim(min_y, max_y)
         ax.tick_params(axis='both', which='major', labelsize=20)
-        fig.savefig('%s/%s_alpha_peak_ch_%d.png' % (request_id, crt_prefix, ch))
+
+        fig.savefig(path_fig / Path('%s_alpha_peak_ch_%d.png' % (crt_prefix, ch)))
         plt.close(fig)
     fig, ax = plt.subplots(1, 1, figsize=(8, 6.0))
     x = np.linspace(0, sfreq / 2, psd.shape[1])
@@ -614,7 +634,7 @@ def alpha_peak_plot(psd, alpha_peak, alpha_peak_power, sfreq, request_id, crt_pr
     ax.get_yaxis().set_ticks([-140, -120, -100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100, 120, 140])
     ax.set_ylim(min_y, max_y)
     ax.tick_params(axis='both', which='major', labelsize=20)
-    fig.savefig('%s/%s_mean_psd.png' % (request_id, crt_prefix))
+    fig.savefig(path_fig / Path('%s_mean_psd.png' % (crt_prefix)))
     plt.close(fig)
 
     pos, outlines = _check_outlines(pos, outlines, head_pos)
@@ -646,11 +666,13 @@ def alpha_peak_plot(psd, alpha_peak, alpha_peak_power, sfreq, request_id, crt_pr
     c_ax_tmp.set_title('channel name', fontsize=12)
     c_ax_tmp.plot(x, 20 * np.log(np.mean(psd, axis=0)), linewidth=0.5)
 
-    ax.figure.savefig(request_id + "/%s_channel_psd" % crt_prefix + ".png")
+    ax.figure.savefig(path_fig / Path("%s_channel_psd" % crt_prefix + ".png"))
     plt.close(ax.figure)
 
 
 def alpha_peak_plot_compare(psd_pre, psd_post, sfreq, request_id, crt_prefix, pos, outlines='head', head_pos=None):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(1, 1, figsize=(8, 6.0))
     x_pre = np.linspace(0, sfreq / 2, psd_pre.shape[1])
     line_pre, = ax.plot(x_pre, 20 * np.log(np.mean(psd_pre, axis=0) + 1E-3), color='blue', label='pre')
@@ -665,7 +687,7 @@ def alpha_peak_plot_compare(psd_pre, psd_post, sfreq, request_id, crt_prefix, po
     ax.get_xaxis().set_ticks([1, 10, 20, 30, 40])
     ax.get_yaxis().set_ticks([-60, -40, -20, 0, 20, 40, 60, 80])
     ax.tick_params(axis='both', which='major', labelsize=20)
-    fig.savefig('%s/%s_mean_psd.png' % (request_id, crt_prefix))
+    fig.savefig('%s_mean_psd.png' % (crt_prefix))
     plt.close(fig)
 
     pos, outlines = _check_outlines(pos, outlines, head_pos)
@@ -699,7 +721,7 @@ def alpha_peak_plot_compare(psd_pre, psd_post, sfreq, request_id, crt_prefix, po
     c_ax_tmp.plot(x_pre, 20 * np.log(np.mean(psd_pre, axis=0)), linewidth=0.5, color='blue')
     c_ax_tmp.plot(x_post, 20 * np.log(np.mean(psd_post, axis=0)), linewidth=0.5, color='red')
 
-    ax.figure.savefig(request_id + "/%s_channel_psd" % crt_prefix + ".png")
+    ax.figure.savefig(path_fig / Path("%s_channel_psd" % crt_prefix + ".png"))
     plt.close(ax.figure)
 
 
@@ -722,8 +744,9 @@ def plot_mi_connect_line(mi, request_id, crt_prefix, pos, outlines, head_pos):
 
 
 def plot_mutual_information(mi, request_id, crt_prefix):
-    tmp_ch_list = ['Fp1', 'F7', 'F3', 'T3', 'C3', 'T5', 'P3', 'O1', 'Fz', 'Cz', 'Pz', 'Fp2', 'F8', 'F4', 'T4', 'C4',
-                   'T6', 'P4', 'O2']
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
+    tmp_ch_list = ['Fp1', 'F7', 'F3', 'T3', 'C3', 'T5', 'P3', 'O1', 'Fz', 'Cz', 'Pz', 'Fp2', 'F8', 'F4', 'T4', 'C4', 'T6', 'P4', 'O2']
     fig, ax = plt.subplots(1, 1, figsize=(5, 5))
     tmp_mi = np.zeros([19, 19])
     for ch1 in range(19):
@@ -735,11 +758,13 @@ def plot_mutual_information(mi, request_id, crt_prefix):
     for ch in range(19):
         ax.text(ch, -1, '%s' % tmp_ch_list[ch], horizontalalignment='center', verticalalignment='center', fontsize=9)
         ax.text(-1.2, ch, '%s' % tmp_ch_list[ch], horizontalalignment='center', verticalalignment='center', fontsize=10)
-    fig.savefig('%s/%s_mi.png' % (request_id, crt_prefix))
+    fig.savefig(path_fig / Path('%s_mi.png' % (crt_prefix)))
     plt.close(fig)
 
 
 def plot_connectivity_line(ch_set, pos, outlines, head_pos, request_id, crt_prefix):
+    path_fig = Path(cfg.OUT_DIR, request_id)
+    path_fig.mkdir(exist_ok=True, parents=True)
     pos, outlines = _check_outlines(pos, outlines, head_pos)
     fig, ax = plt.subplots(1, 1, figsize=(5, 5))
     make_head_outline(ax, outlines)
@@ -750,5 +775,5 @@ def plot_connectivity_line(ch_set, pos, outlines, head_pos, request_id, crt_pref
     for con_set in ch_set:
         plt.plot([pos[con_set[0], 0], pos[con_set[1], 0]], [pos[con_set[0], 1], pos[con_set[1], 1]], color='black')
 
-    fig.savefig('%s/%s_connectivity_line.png' % (request_id, crt_prefix))
+    fig.savefig(path_fig / Path('%s_connectivity_line.png' % (crt_prefix)))
     plt.close(fig)

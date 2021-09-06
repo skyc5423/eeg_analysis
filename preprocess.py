@@ -6,6 +6,9 @@ from figure_manager import plot_ica_topomap
 from mne.viz.topomap import _check_outlines
 from scipy.stats import beta
 from mne_data.interpolation import _GridData
+from config.cfg import cfg
+from save_edf import write_edf
+from pathlib import Path
 
 
 def interpolate_topo_map(power, pos, outlines, aspect_ratio=None, n=128, kind='cubic'):
@@ -174,20 +177,6 @@ def preprocess_raw_data(custom_raw, request_id, model, crt_prefix='crt'):
     custom_raw = filtering_custom_raw(custom_raw)
     custom_raw = artifact_remove_asr(custom_raw)
 
-    # if data_edf is None:
-    #     signals = []
-    #     for preprocessed_data in custom_raw.get_data():
-    #         for annot in eeg_info["annotations"]:
-    #             if annot.name.lower() == "bad":
-    #                 preprocessed_data[int(annot.startIndex):int(annot.endIndex)] = np.nan
-    #         preprocessed_data = preprocessed_data[~np.isnan(preprocessed_data)]
-    #         if int(custom_raw.info['sfreq']) > len(preprocessed_data):
-    #             return False, "More than 5 seconds EEG are required!", None, None
-    #         signals.append(preprocessed_data.tolist())
-    #     signals = np.array(signals)
-    # else:
-    #     signals = custom_raw.get_data()
-
     custom_raw, tmax, tmin = crop_data(custom_raw)
 
     art_removed_custom_raw = artifact_remove_ica(custom_raw, crt_prefix, 'head', request_id, model, tmax)
@@ -199,6 +188,9 @@ def make_epoch_custom_raw(ytdf_dir, data_edf=None, request_id=None, crt_prefix='
     custom_raw, eeg_info, bad_channels = make_mne_raw(ytdf_dir, data_edf, specs=None)
     custom_raw = preprocess_raw_data(custom_raw, request_id, model, crt_prefix=crt_prefix)
 
-    # write_edf(art_removed_custom_raw, "%s/%s" % (request_id, 'artifact_free_edf.edf'))
+    if cfg.PREPROCESS:
+        path_preprocess = Path(cfg.OUT_DIR, request_id)
+        path_preprocess.mkdir(exist_ok=True, parents=True)
+        write_edf(custom_raw, str(path_preprocess / Path('artifact_free.edf')))
 
     return custom_raw

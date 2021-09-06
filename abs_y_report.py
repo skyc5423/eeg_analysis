@@ -258,6 +258,10 @@ class YReport(metaclass=ABCMeta):
     def get_age(self, birthday: str):
         import datetime
         now = datetime.datetime.now()
+        try:
+            birthday = int(birthday)
+        except:
+            birthday = birthday
 
         if isinstance(birthday, int):
             birth_year, birth_month, birth_day = birthday / 10000, birthday % 10000 / 100, birthday % 10000 % 100

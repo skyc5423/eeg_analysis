@@ -699,19 +699,25 @@ def make_analysis(art_removed_custom_raw, request_id, crt_prefix, age, language=
     # Compute several features and make topomaps
     abs_power, rel_power, f, psd, rat_power = get_power(art_removed_custom_raw)
     # abs_power, rel_power, psd, rat_power = get_power_v2(art_removed_custom_raw)
-    # raw_data_dict = {'abs_power': abs_power,
-    #                  'rel_power': rel_power,
-    #                  'rat_power': rat_power,
-    #                  'asym': None,
-    #                  'coh': None,
-    #                  'alpha_peak': None,
-    #                  'alpha_peak_power': None,
-    #                  'mse': None,
-    #                  'samp_entropy': None,
-    #                  'lzc': None,
-    #                  'sef_95': None,
-    #                  'mi': None,
-    #                  'dfa': None}
+
+    if cfg.FEATURE and cfg.ONLY_POWER:
+        raw_data_dict = {'abs_power': abs_power,
+                         'rel_power': rel_power,
+                         'rat_power': rat_power,
+                         'asym': None,
+                         'coh': None,
+                         'alpha_peak': None,
+                         'alpha_peak_power': None,
+                         'mse': None,
+                         'samp_entropy': None,
+                         'lzc': None,
+                         'sef_95': None,
+                         'mi': None,
+                         'dfa': None}
+
+        write_excel(None, raw_data_dict, f, psd, request_id)
+        raise Exception('Configuration to save only power feature is set True. Remained processes are skipped')
+
     logical_cpu_count = psutil.cpu_count(logical=True)
     pool_size = min(logical_cpu_count, 3)
     with Pool(processes=pool_size) as worker_pool:
@@ -770,7 +776,11 @@ def make_analysis(art_removed_custom_raw, request_id, crt_prefix, age, language=
                                 'dfa': dfa},
                                age=age)
 
-    write_excel(cdf_dict, raw_data_dict, f, psd, request_id, 'value', age)
+    if cfg.FEATURE:
+        write_excel(cdf_dict, raw_data_dict, f, psd, request_id)
+
+    if not cfg.REPORT:
+        raise Exception('Configuration to save report is set False. Remained processes are skipped')
 
     for feature in ['abs_power', 'rel_power', 'rat_power']:
         plot_topo_map(cdf_dict[feature], constants.pos, 'head', request_id, crt_prefix, feature, True, None)

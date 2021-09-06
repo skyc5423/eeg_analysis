@@ -11,6 +11,9 @@ from thrift_model.TSignalDesc.ttypes import SignalLabel, DimensionType, Transduc
 from thrift_model.TSignalSession.ttypes import TSignalSession
 from openpyxl import Workbook
 
+from pathlib import Path
+from config.cfg import cfg
+
 
 def build(mPmax, mPmin, mDmax, mDmin):
     return (mPmax - mPmin) / float(mDmax - mDmin)
@@ -250,47 +253,55 @@ def make_mne_raw(ytdf_dir, data_edf=None, specs=None):
     return mne_raw, eeg_info, bad_channels
 
 
-def write_excel(cdf_dict, raw_dict, f, psd, request_id, file_name='value', age=0):
+def write_excel(cdf_dict, raw_dict, f, psd, request_id):
     YB_CH_NAME_LIST = ['', 'Fp1', 'F7', 'T3', 'T5', 'T6', 'T4', 'F8', 'Fp2', 'F4', 'C4', 'P4', 'O2', 'Pz', 'Fz', 'Cz', 'O1', 'P3', 'C3', 'F3']
     write_wb = Workbook()
-    for feature in ['abs_power', 'rel_power', 'rat_power']:
-        write_ws = write_wb.create_sheet('%s_cdf' % (feature))
-        write_ws.append(YB_CH_NAME_LIST)
-        for band in cdf_dict[feature].keys():
-            power = cdf_dict[feature][band]
-            write_ws.append([band] + list(power))  # list
 
-    for feature in ['abs_power', 'rel_power', 'rat_power']:
-        write_ws = write_wb.create_sheet('%s_raw' % (feature))
-        write_ws.append(YB_CH_NAME_LIST)
-        for band in raw_dict[feature].keys():
-            power = raw_dict[feature][band]
-            write_ws.append([band] + list(power))  # list
+    if raw_dict is not None:
+        for feature in ['abs_power', 'rel_power', 'rat_power']:
+            write_ws = write_wb.create_sheet('%s_raw' % (feature))
+            write_ws.append(YB_CH_NAME_LIST)
+            for band in raw_dict[feature].keys():
+                power = raw_dict[feature][band]
+                write_ws.append([band] + list(power))  # list
 
-    write_ws = write_wb.create_sheet('alpha peak')
-    write_ws.append(YB_CH_NAME_LIST)
-    write_ws.append(['alpha peak frequency'] + list(raw_dict['alpha_peak']))
-    write_ws.append(['alpha peak power'] + list(raw_dict['alpha_peak_power']))
+        if raw_dict['alpha_peak'] is not None:
+            write_ws = write_wb.create_sheet('alpha peak')
+            write_ws.append(YB_CH_NAME_LIST)
+            write_ws.append(['alpha peak frequency'] + list(raw_dict['alpha_peak']))
+            write_ws.append(['alpha peak power'] + list(raw_dict['alpha_peak_power']))
 
-    for band in raw_dict['coh'].keys():
-        cur_coh = raw_dict['coh'][band]
-        write_ws = write_wb.create_sheet('coherence_%s' % band)
-        write_ws.append(YB_CH_NAME_LIST)
-        for ch in range(19):
-            write_ws.append([YB_CH_NAME_LIST[ch + 1]] + list(cur_coh[ch]))
+        if raw_dict['coh'] is not None:
+            for band in raw_dict['coh'].keys():
+                cur_coh = raw_dict['coh'][band]
+                write_ws = write_wb.create_sheet('coherence_%s' % band)
+                write_ws.append(YB_CH_NAME_LIST)
+                for ch in range(19):
+                    write_ws.append([YB_CH_NAME_LIST[ch + 1]] + list(cur_coh[ch]))
 
-    write_ws = write_wb.create_sheet('summary_score')
-    summary_feature_list = ['stress', 'cognition', 'concentration', 'use_of_brain', 'memory_operate', 'info_amount', 'info_speed', 'info_complex']
-    write_ws.append(summary_feature_list)
-    summary_value_list = []
-    for feature in summary_feature_list:
-        summary_value_list.append(cdf_dict[feature])
-    write_ws.append(summary_value_list)
+    if cdf_dict is not None:
+        for feature in ['abs_power', 'rel_power', 'rat_power']:
+            write_ws = write_wb.create_sheet('%s_cdf' % (feature))
+            write_ws.append(YB_CH_NAME_LIST)
+            for band in cdf_dict[feature].keys():
+                power = cdf_dict[feature][band]
+                write_ws.append([band] + list(power))  # list
 
-    write_ws = write_wb.create_sheet('psd')
-    write_ws.append(YB_CH_NAME_LIST)
-    for i in range(np.where(f <= 50)[0].shape[0]):
-        write_ws.append(['%.4fHz' % f[i]] + list(psd[:, i]))
+        if cdf_dict['stress'] is not None:
+            write_ws = write_wb.create_sheet('summary_score')
+            summary_feature_list = ['stress', 'cognition', 'concentration', 'use_of_brain', 'memory_operate', 'info_amount', 'info_speed', 'info_complex']
+            write_ws.append(summary_feature_list)
+            summary_value_list = []
+            for feature in summary_feature_list:
+                summary_value_list.append(cdf_dict[feature])
+            write_ws.append(summary_value_list)
 
-    write_wb.save('./%s/%s_age_%d.xlsx' % (request_id, file_name, age))
-    print('./%s/%s_age_%d.xlsx saved' % (request_id, file_name, age))
+            write_ws = write_wb.create_sheet('psd')
+            write_ws.append(YB_CH_NAME_LIST)
+            for i in range(np.where(f <= 50)[0].shape[0]):
+                write_ws.append(['%.4fHz' % f[i]] + list(psd[:, i]))
+
+    write_wb.remove_sheet(write_wb['Sheet'])
+    path_csv = Path(cfg.OUT_DIR, request_id)
+    path_csv.mkdir(exist_ok=True, parents=True)
+    write_wb.save(path_csv / Path('feature_val.xlsx'))
