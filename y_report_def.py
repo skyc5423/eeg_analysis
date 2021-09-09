@@ -25,8 +25,8 @@ class Constants():
     """"""""""""""""""""""""""""""""
     """COMMON PAGE DESIGN ARGUMENT"""
     """"""""""""""""""""""""""""""""
-    CMN_TEMPLATE_REC_IMG = './img/img-page-accessories.png'
-    CMN_RECT_DOUBLE_IMG = './img/icon-rectangle-double.png'
+    CMN_TEMPLATE_REC_IMG = './resource/img/img-page-accessories.png'
+    CMN_RECT_DOUBLE_IMG = './resource/img/icon-rectangle-double.png'
 
     CMN_RECT_DOUBLE_W = 43
     CMN_RECT_DOUBLE_H = 43
@@ -49,7 +49,7 @@ class Constants():
     """"""""""""""""""""""""""""""""
     """COVER PAGE DESIGN ARGUMENT"""
     """"""""""""""""""""""""""""""""
-    COVER_REC_1_IMG = './img/img-cover-accessories.png'
+    COVER_REC_1_IMG = './resource/img/img-cover-accessories.png'
     COVER_REC_1_X = 0
     COVER_REC_1_W = 196
     COVER_REC_1_Y = 0
@@ -82,7 +82,7 @@ class Constants():
     COVER_REPORT_TEXT_X = 310
     COVER_REPORT_TEXT_Y = 1768
 
-    COVER_BRAIN_IMG = './img/img-main-brain.png'
+    COVER_BRAIN_IMG = './resource/img/img-main-brain.png'
     COVER_BRAIN_IMG_X = 987
     COVER_BRAIN_IMG_Y = 300
     COVER_BRAIN_IMG_W = 1333
@@ -113,7 +113,7 @@ class Constants():
     COVER_BAR_GENDER_Y = 2821
     COVER_BAR_HAND_Y = 2943
 
-    COVER_YB_IMG = './img/img-cover-accessories-ybrain.png'
+    COVER_YB_IMG = './resource/img/img-cover-accessories-ybrain.png'
     COVER_YB_IMG_X = 2282
     COVER_YB_IMG_Y = 2434
     COVER_YB_IMG_W = 198
@@ -200,7 +200,7 @@ class Constants():
     INTRO_BRAIN_TEXT_Y = 710
     INTRO_BRAIN_TEXT_SIZE = 60
     INTRO_BRAIN_TEXT_COLOR = Y_BLACK_TEXT
-    INTRO_BRAIN_IMG = './img/img-brain-desc.png'
+    INTRO_BRAIN_IMG = './resource/img/img-brain-desc.png'
     INTRO_BRAIN_IMG_X = 360
     INTRO_BRAIN_IMG_Y = 820
     INTRO_BRAIN_IMG_W = 1793
@@ -212,7 +212,7 @@ class Constants():
     INTRO_VIEW_TEXT_Y = 1780
     INTRO_VIEW_TEXT_SIZE = 60
     INTRO_VIEW_TEXT_COLOR = Y_BLACK_TEXT
-    INTRO_VIEW_IMG = './img/img-3.png'
+    INTRO_VIEW_IMG = './resource/img/img-3.png'
     INTRO_VIEW_IMG_X = 470
     INTRO_VIEW_IMG_Y = 2025
     INTRO_VIEW_IMG_W = 1747
@@ -224,7 +224,7 @@ class Constants():
     INTRO_FREQUENCY_TEXT_Y = 719
     INTRO_FREQUENCY_TEXT_SIZE = 60
     INTRO_FREQUENCY_TEXT_COLOR = Y_BLACK_TEXT
-    INTRO_FREQUENCY_IMG = './img/img-frequency.png'
+    INTRO_FREQUENCY_IMG = './resource/img/img-frequency.png'
     INTRO_FREQUENCY_IMG_X = 371
     INTRO_FREQUENCY_IMG_Y = 895
     INTRO_FREQUENCY_IMG_W = 1805
@@ -236,7 +236,7 @@ class Constants():
     INTRO_GRAPH_TEXT_Y = 1419
     INTRO_GRAPH_TEXT_SIZE = 60
     INTRO_GRAPH_TEXT_COLOR = Y_BLACK_TEXT
-    INTRO_GRAPH_IMG = './img/img-graph.png'
+    INTRO_GRAPH_IMG = './resource/img/img-graph.png'
     INTRO_GRAPH_IMG_X = 548
     INTRO_GRAPH_IMG_Y = 1608
     INTRO_GRAPH_IMG_W = 1518
@@ -248,7 +248,7 @@ class Constants():
     INTRO_MONTAGE_TEXT_Y = 2442
     INTRO_MONTAGE_TEXT_SIZE = 60
     INTRO_MONTAGE_TEXT_COLOR = Y_BLACK_TEXT
-    INTRO_MONTAGE_IMG = './img/img-brain.png'
+    INTRO_MONTAGE_IMG = './resource/img/img-brain.png'
     INTRO_MONTAGE_IMG_X = 776
     INTRO_MONTAGE_IMG_Y = 2515
     INTRO_MONTAGE_IMG_W = 978
@@ -302,7 +302,7 @@ class Constants():
 
     INTRO_EEG_DETAIL_TEXT_INDENT = 12
 
-    INTRO_EEG_GRAPH_IMG = './img/img-graph.png'
+    INTRO_EEG_GRAPH_IMG = './resource/img/img-graph.png'
     INTRO_EEG_GRAPH_IMG_X = 1153
     INTRO_EEG_GRAPH_IMG_Y = 2813
     INTRO_EEG_GRAPH_IMG_W = 1138
@@ -316,7 +316,7 @@ class Constants():
     INTRO_FREQ_TEXT_SIZE = 60
     INTRO_FREQ_TEXT_COLOR = Y_BLACK_TEXT
 
-    INTRO_FREQ_IMG = './img/img-frequency.png'
+    INTRO_FREQ_IMG = './resource/img/img-frequency.png'
     INTRO_FREQ_IMG_X = 307
     INTRO_FREQ_IMG_Y = 2335
     INTRO_FREQ_IMG_W = 1868
@@ -782,7 +782,7 @@ class Constants():
     TIME_TEXT_SIZE = 40
     TIME_TEXT_COLOR = Y_BLACK_TEXT
 
-    CMP_ALPHA_PSD_IMG = '%s/%s_alpha_peak_ch_%d.png'
+    CMP_ALPHA_PSD_IMG = '%s_alpha_peak_ch_%d.png'
     CMP_ALPHA_PSD_IMG_X = 450
     CMP_ALPHA_PSD_IMG_Y = 900
     CMP_ALPHA_PSD_IMG_X_OFFSET = 900
@@ -793,7 +793,7 @@ class Constants():
     CMP_ALPHA_TIME_TEXT_X = 300
     CMP_ALPHA_TIME_TEXT_Y = 1250
 
-    CMP_ALPHA_DIFF_IMG = '%s/diff_alpha_compare_%d.png'
+    CMP_ALPHA_DIFF_IMG = 'diff_alpha_compare_%d.png'
 
     CMP_ALPHA_NO_DESC_TEXT_Y = 2955
     CMP_ALPHA_NO_DESC_LINE_1_Y = 2715
@@ -818,7 +818,7 @@ class Constants():
         'Gamma': np.array([0.8, 0.2, 0.145, 0.09, 0.19, 0.101, 0.19, 0.2, 0.18, 0.218, 0.2, 0.21, 0.105, 0.1, 0.209, 0.23, 0.018, 0.21, 0.11])
     }
 
-    APPENDIX_ANALYSIS_IMG = './img/appendix.png'
+    APPENDIX_ANALYSIS_IMG = './resource/img/appendix.png'
 
     APPENDIX_ANALYSIS_IMG_X = 300
     APPENDIX_ANALYSIS_IMG_Y = 700

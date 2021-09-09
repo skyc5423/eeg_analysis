@@ -822,3 +822,10 @@ def make_analysis_fake():
     for feature in ['stress', 'cognition', 'concentration', 'use_of_brain', 'memory_operate', 'info_amount', 'info_speed', 'info_complex', 'connectivity']:
         cdf_dict[feature] = np.random.random()
     return cdf_dict, None
+
+
+def make_cmp_analysis(pre_raw, post_raw, request_id, crt_prefix):
+    _, _, f, pre_psd, _ = get_power(pre_raw)
+    _, _, f, post_psd, _ = get_power(post_raw)
+
+    alpha_peak_plot_compare(pre_psd, post_psd, pre_raw.info['sfreq'], request_id, crt_prefix, constants.pos, outlines='head', head_pos=None)

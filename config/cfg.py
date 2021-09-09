@@ -10,7 +10,7 @@ _C.PREPROCESS = True
 _C.FEATURE = True
 _C.ONLY_POWER = False
 _C.REPORT = True
-_C.DUPLICATE = True
+_C.DUPLICATE = False
 
 _C.OUT_DIR = './output'
 

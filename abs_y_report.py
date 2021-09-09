@@ -51,17 +51,17 @@ class YReport(metaclass=ABCMeta):
                 self.c.showPage()
 
     def register_font(self):
-        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL, 'font/arial.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_MT, 'font/arialmt.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_BLACK, 'font/arial-black.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN, 'font/times-new-roman.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN_ITALIC, 'font/times-new-roman-Italic.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL, 'resource/font/arial.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_MT, 'resource/font/arialmt.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_BLACK, 'resource/font/arial-black.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN, 'resource/font/times-new-roman.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN_ITALIC, 'resource/font/times-new-roman-Italic.ttf'))
         if self.language == 'Japanese':
-            pdfmetrics.registerFont(TTFont(self.const.FONT_KOSUGI_MARU_REGULAR, 'font/KosugiMaru-Regular.ttf'))
+            pdfmetrics.registerFont(TTFont(self.const.FONT_KOSUGI_MARU_REGULAR, 'resource/font/KosugiMaru-Regular.ttf'))
         elif self.language == 'Korean':
-            pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM, 'font/NanumSquareRegular.ttf'))
-            pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_BOLD, 'font/NanumSquareBold.ttf'))
-            pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_EX_BOLD, 'font/NanumSquareExtraBold.ttf'))
+            pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM, 'resource/font/NanumSquareRegular.ttf'))
+            pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_BOLD, 'resource/font/NanumSquareBold.ttf'))
+            pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_EX_BOLD, 'resource/font/NanumSquareExtraBold.ttf'))
 
     def get_clr(self, str_color, alpha=1.0):
         r = int(str_color[1:3], 16)

@@ -4,9 +4,10 @@ from file_io import read_file
 from request_example import TEST_INFO
 from analysis import get_age
 from preprocess import make_epoch_custom_raw
-from analysis import make_analysis, make_analysis_fake
+from analysis import make_analysis, make_analysis_fake, make_cmp_analysis
 from y_report_analysis import YReportAnalysis
-import tf_model
+from y_report_compare import YReportCompare
+from library import tf_model
 import constants
 import argparse
 import sys
@@ -20,25 +21,43 @@ from warnings import simplefilter
 def make_compare_analysis(crt_ytdf_file, crt_edf_data, info_crt, cmp_ytdf_file, cmp_edf_data, info_cmp, request_id, language='Korean', model=None):
     age = get_age(info_crt['subject']['birthday'])
 
-    pre_art_removed_custom_raw = make_epoch_custom_raw(cmp_ytdf_file, cmp_edf_data, request_id, crt_prefix='cmp', model=model)
-    pst_art_removed_custom_raw = make_epoch_custom_raw(crt_ytdf_file, crt_edf_data, request_id, crt_prefix='crt', model=model)
+    if not cfg.DEBUG_MODE:
+        pre_art_removed_custom_raw = make_epoch_custom_raw(cmp_ytdf_file, cmp_edf_data, request_id, crt_prefix='cmp', model=model)
+        pst_art_removed_custom_raw = make_epoch_custom_raw(crt_ytdf_file, crt_edf_data, request_id, crt_prefix='crt', model=model)
+        cmp_cdf_dict, raw_data_dict = make_analysis(art_removed_custom_raw=pre_art_removed_custom_raw,
+                                                    request_id=request_id,
+                                                    crt_prefix='cmp',
+                                                    language=language,
+                                                    age=age)
 
-    cmp_cdf_dict, raw_data_dict = make_analysis(
-        art_removed_custom_raw=pre_art_removed_custom_raw,
-        request_id=request_id,
-        crt_prefix='cmp',
-        language=language,
-        age=age)
-    crt_cdf_dict, raw_data_dict = make_analysis(
-        art_removed_custom_raw=pst_art_removed_custom_raw,
-        request_id=request_id,
-        crt_prefix='crt',
-        language=language,
-        age=age)
+        crt_cdf_dict, raw_data_dict = make_analysis(art_removed_custom_raw=pst_art_removed_custom_raw,
+                                                    request_id=request_id,
+                                                    crt_prefix='crt',
+                                                    language=language,
+                                                    age=age)
 
-    make_cmp_analysis(pre_art_removed_custom_raw, pst_art_removed_custom_raw, request_id, 'diff')
+        make_cmp_analysis(pre_art_removed_custom_raw, pst_art_removed_custom_raw, request_id, 'diff')
+    else:
+        cmp_cdf_dict, raw_data_dict = make_analysis_fake()
+        crt_cdf_dict, raw_data_dict = make_analysis_fake()
+
     return make_compare_report(request_id, info_crt, info_cmp, language=language, crt_cdf_dict=crt_cdf_dict,
                                cmp_cdf_dict=cmp_cdf_dict)
+
+
+def make_compare_report(request_id, info_crt, info_cmp, crt_cdf_dict, cmp_cdf_dict, language='Korean', for_eeg=True):
+    if 'anlzRequest' in info_crt.keys():
+        appendix_page = info_crt['anlzRequest']['appendix']
+    else:
+        appendix_page = False
+
+    yr = YReportCompare(request_id, info_crt, info_cmp, language='Korean')
+
+    yr.make_compare_report_pdf(cover_page=for_eeg, functional_abnormal_page=for_eeg, power_page=for_eeg,
+                              psd_ch_page=for_eeg, alpha_peak_page=for_eeg, connectivity_page=for_eeg,
+                              reference_page=for_eeg, appendix_page=appendix_page,
+                              appendix_feature_page=for_eeg, crt_cdf_dict=crt_cdf_dict, cmp_cdf_dict=cmp_cdf_dict)
+    return yr.path
 
 
 def make_single_analysis(crt_ytdf_file, crt_edf_data, request_id, info_crt, language='Korean', model=None):
@@ -109,8 +128,32 @@ def comp_analysis_eeg(info, crt_file_name, cmp_file_name, language='Korean', mod
     info['anlzRequest']['id'] = crt_file_name.split('.')[0]
     request_id = str(info["anlzRequest"]["id"])
 
-    crt_ytdf_ref_file, crt_edf_data = read_file(info, crt_file_name)
-    cmp_ytdf_ref_file, cmp_edf_data = read_file(info, cmp_file_name)
+    if cfg.DEBUG_MODE:
+        crt_ytdf_ref_file = None
+        crt_edf_data = {}
+        crt_edf_data['data'] = np.array([])
+        crt_edf_data['fs'] = 500
+        crt_edf_data['ch_names'] = constants.YBRAIN_CH_LIST
+        crt_edf_data['data_types'] = []
+        for i in range(19):
+            crt_edf_data['data_types'].append('eeg')
+
+        cmp_ytdf_ref_file = None
+        cmp_edf_data = {}
+        cmp_edf_data['data'] = np.array([])
+        cmp_edf_data['fs'] = 500
+        cmp_edf_data['ch_names'] = constants.YBRAIN_CH_LIST
+        cmp_edf_data['data_types'] = []
+        for i in range(19):
+            cmp_edf_data['data_types'].append('eeg')
+    else:
+
+        if not cfg.DUPLICATE:
+            if Path(cfg.OUT_DIR, request_id).exists():
+                raise Exception('Already exists: %s' % (Path(cfg.OUT_DIR, request_id)))
+
+        crt_ytdf_ref_file, crt_edf_data = read_file(info, crt_file_name)
+        cmp_ytdf_ref_file, cmp_edf_data = read_file(info, cmp_file_name)
 
     make_compare_analysis(crt_ytdf_file=crt_ytdf_ref_file, crt_edf_data=crt_edf_data,
                           cmp_ytdf_file=cmp_ytdf_ref_file, cmp_edf_data=cmp_edf_data, request_id=request_id,
@@ -169,6 +212,7 @@ def main():
                 inst_message = instance.args[0]
                 print("%s failed: %s" % (src_path, inst_message))
     elif args.mode == 'compare':
+        config.load_cfg('./config/config_file_compare.yaml')
         print("Compare analysis starts")
         try:
             print("%s vs %s starts" % (args.path, args.old_path))
@@ -181,6 +225,6 @@ def main():
 
 if __name__ == '__main__':
     # sys.argv = ['main.py', '--mode', 'analysis', '--path', 'testdata', 'OUT_DIR', 'output', 'PREPROCESS', 'True', 'DEBUG_MODE', 'False']
-    sys.argv = ['main.py', '--mode', 'compare', '--path', '0000-김나경-20210315-094123.edf', '--old_path', '+616-지익상-20210510-144115.edf', 'OUT_DIR', 'output', 'DEBUG_MODE',
+    sys.argv = ['main.py', '--mode', 'compare', '--path', 'kim20210813-204049.edf', '--old_path', 'kim.edf', 'OUT_DIR', 'output', 'DEBUG_MODE',
                 'True']
     main()

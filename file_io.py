@@ -7,8 +7,8 @@ import constants
 from scipy import io
 
 from thrift import TSerialization
-from thrift_model.TSignalDesc.ttypes import SignalLabel, DimensionType, TransducerType, EyeStatus
-from thrift_model.TSignalSession.ttypes import TSignalSession
+from library.thrift_model.TSignalDesc.ttypes import SignalLabel, DimensionType, TransducerType, EyeStatus
+from library.thrift_model.TSignalSession.ttypes import TSignalSession
 from openpyxl import Workbook
 
 from pathlib import Path

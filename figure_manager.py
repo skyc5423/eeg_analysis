@@ -1,11 +1,10 @@
 from mne.viz.topomap import _draw_outlines, _check_outlines
 import numpy as np
-import os
 import constants
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 from matplotlib.patches import Ellipse
-from mne_data.interpolation import _GridData
+from library.mne_data.interpolation import _GridData
 from scipy.stats import norm
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
@@ -157,12 +156,12 @@ def information_speed(score, request_id, crt_prefix, language='Korean'):
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
     if language == 'Korean':
-        font_location = './font/NanumSquareBold.ttf'
+        font_location = './resource/font/NanumSquareBold.ttf'
         fontprop = fm.FontProperties(fname=font_location)
         slow_text = '느림'
         fast_text = '빠름'
     else:
-        font_location = './font/KosugiMaru-Regular.ttf'
+        font_location = './resource/font/KosugiMaru-Regular.ttf'
         fontprop = fm.FontProperties(fname=font_location)
         slow_text = 'slow'
         fast_text = 'fast'
@@ -243,11 +242,11 @@ def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, la
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
     if language == 'Korean':
-        font_location = './font/NanumSquareBold.ttf'
+        font_location = './resource/font/NanumSquareBold.ttf'
         fontprop = fm.FontProperties(fname=font_location)
         complexity_text = '복잡도'
     else:
-        font_location = './font/KosugiMaru-Regular.ttf'
+        font_location = './resource/font/KosugiMaru-Regular.ttf'
         fontprop = fm.FontProperties(fname=font_location)
         complexity_text = '複雑度'
 
@@ -321,8 +320,8 @@ def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, la
 def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix):
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
-    im1 = Image.open('img/brain-top-outline.png')
-    im2 = Image.open('img/brain-top-fill.png')
+    im1 = Image.open('resource/img/brain-top-outline.png')
+    im2 = Image.open('resource/img/brain-top-fill.png')
     im1 = im1.resize((im2.size[0] + 2, im2.size[1] + 5))
 
     im1 = np.array(im1)
@@ -358,8 +357,8 @@ def use_of_brain(score_brain_use, request_id, crt_prefix):
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
 
-    im1 = Image.open('./img/brain-side-outline.png')
-    im2 = Image.open('./img/brain-side-fill.png')
+    im1 = Image.open('resource/img/brain-side-outline.png')
+    im2 = Image.open('resource/img/brain-side-fill.png')
     im1 = im1.resize((im2.size[0] + 2, im2.size[1] + 5))
 
     im1 = np.array(im1)
@@ -396,7 +395,7 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
     path_fig.mkdir(exist_ok=True, parents=True)
 
     if language == 'Korean':
-        font_location = './font/NanumSquareBold.ttf'
+        font_location = './resource/font/NanumSquareBold.ttf'
         fontprop = fm.FontProperties(fname=font_location)
         very_low_text = '매우낮음'
         low_text = '낮음'
@@ -411,7 +410,7 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
         idx_desc_text = '%s 지수가 백분위 %d%% 수준입니다.'
 
     else:
-        font_location = './font/KosugiMaru-Regular.ttf'
+        font_location = './resource/font/KosugiMaru-Regular.ttf'
         fontprop = fm.FontProperties(fname=font_location)
         very_low_text = 'とても低い'
         low_text = '低い'
@@ -494,7 +493,7 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
 def memory_operate(alpha_score, request_id, crt_prefix):
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
-    font_location = './font/NanumSquareBold.ttf'
+    font_location = './resource/font/NanumSquareBold.ttf'
     fontprop = fm.FontProperties(fname=font_location)
     level_define_var = ['매우낮음', '낮음', '표준', '높음', '매우높음']
     level_define_var_color = ['#6dc6bd33', '#6dc6bd66', '#6dc6bd99', '#6dc6bdcc', '#6dc6bd']
@@ -687,7 +686,7 @@ def alpha_peak_plot_compare(psd_pre, psd_post, sfreq, request_id, crt_prefix, po
     ax.get_xaxis().set_ticks([1, 10, 20, 30, 40])
     ax.get_yaxis().set_ticks([-60, -40, -20, 0, 20, 40, 60, 80])
     ax.tick_params(axis='both', which='major', labelsize=20)
-    fig.savefig('%s_mean_psd.png' % (crt_prefix))
+    fig.savefig(path_fig / Path('%s_mean_psd.png' % (crt_prefix)))
     plt.close(fig)
 
     pos, outlines = _check_outlines(pos, outlines, head_pos)

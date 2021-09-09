@@ -5,7 +5,7 @@ from file_io import make_mne_raw
 from figure_manager import plot_ica_topomap
 from mne.viz.topomap import _check_outlines
 from scipy.stats import beta
-from mne_data.interpolation import _GridData
+from library.mne_data.interpolation import _GridData
 from config.cfg import cfg
 from save_edf import write_edf
 from pathlib import Path

@@ -1,0 +1,9 @@
+PREPROCESS: False
+FEATURE: False
+ONLY_POWER: False
+REPORT: True
+DUPLICATE: True
+OUT_DIR: ./output
+
+LANGUAGE: Korean
+
