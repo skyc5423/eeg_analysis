@@ -1,5 +1,5 @@
 import reportlab.lib.colors as colors
-from analysis.y_report_def import Constants
+from y_report_def import Constants
 
 
 class KoreanConstants(Constants):
@@ -88,7 +88,7 @@ class KoreanConstants(Constants):
     SUMMARY_HEALTH_REC_X = 325
     SUMMARY_HEALTH_REC_Y = 960
 
-    SUMMARY_HEALTH_IMAGE = './%s/pentagon_chart.png'
+    SUMMARY_HEALTH_IMAGE = './pentagon_chart.png'
     SUMMARY_HEALTH_IMAGE_X = 300
     SUMMARY_HEALTH_IMAGE_Y = 1100
     SUMMARY_HEALTH_IMAGE_W = 900
@@ -104,7 +104,7 @@ class KoreanConstants(Constants):
     SUMMARY_AGE_REC_X = 1625
     SUMMARY_AGE_REC_Y = 960
 
-    SUMMARY_AGE_IMAGE = './%s/age_figure.png'
+    SUMMARY_AGE_IMAGE = './age_figure.png'
     SUMMARY_AGE_IMAGE_X = 1400
     SUMMARY_AGE_IMAGE_Y = 1100
     SUMMARY_AGE_IMAGE_W = 900
@@ -122,7 +122,7 @@ class KoreanConstants(Constants):
 
     SUMMARY_FEATURE_TEXT_LIST = [['자율신경 활성도', '부교감신경 활성도', '교감신경 활성도'], ['Heart Rate', 'SDNN', 'RMSSD']]
     SUMMARY_FEATURE_KEY_LIST = [['autonomic', 'parasympathetic', 'sympathetic'], ['hr', 'sdnn', 'rmssd']]
-    SUMMARY_FEATURE_IMAGE_LIST = [['./%s/autonomic.png', './%s/parasympathetic.png', './%s/sympathetic.png'], ['./%s/Heart Rate.png', './%s/SDNN.png', './%s/RMSSD.png']]
+    SUMMARY_FEATURE_IMAGE_LIST = [['./autonomic.png', './parasympathetic.png', './sympathetic.png'], ['./Heart Rate.png', './SDNN.png', './RMSSD.png']]
 
     SUMMARY_FEATURE_TABLE_X = 316 * Constants.UNIT_PIXEL
     SUMMARY_FEATURE_TABLE_X_OFFSET = 600 * Constants.UNIT_PIXEL
@@ -179,7 +179,7 @@ class KoreanConstants(Constants):
     ANALYSIS_ECG_TEXT_Y = 590
     ANALYSIS_ECG_TEXT_SIZE = 30
 
-    ANALYSIS_ECG_IMAGE = './%s/ecg.png'
+    ANALYSIS_ECG_IMAGE = './ecg.png'
     ANALYSIS_ECG_IMAGE_X = 280
     ANALYSIS_ECG_IMAGE_Y = 640
     ANALYSIS_ECG_IMAGE_W = 1830
@@ -192,7 +192,7 @@ class KoreanConstants(Constants):
     ANALYSIS_RR_TEXT_Y = 900
     ANALYSIS_RR_TEXT_SIZE = 30
 
-    ANALYSIS_RR_IMAGE = './%s/rr.png'
+    ANALYSIS_RR_IMAGE = './rr.png'
     ANALYSIS_RR_IMAGE_X = 200
     ANALYSIS_RR_IMAGE_Y = 950
     ANALYSIS_RR_IMAGE_W = 1910
@@ -251,7 +251,7 @@ class KoreanConstants(Constants):
         ('ALIGNMENT', (0, 0), (-1, -1), 'CENTER'),
     ]
 
-    ANALYSIS_RR_DIST_IMAGE = './%s/rr_hist.png'
+    ANALYSIS_RR_DIST_IMAGE = './rr_hist.png'
     ANALYSIS_RR_DIST_IMAGE_X = 1290
     ANALYSIS_RR_DIST_IMAGE_Y = 1450
     ANALYSIS_RR_DIST_IMAGE_W = 810
@@ -319,7 +319,7 @@ class KoreanConstants(Constants):
         ('ALIGNMENT', (0, 0), (-1, -1), 'CENTER'),
     ]
 
-    ANALYSIS_RR_SPEC_IMAGE = './%s/psd.png'
+    ANALYSIS_RR_SPEC_IMAGE = './psd.png'
     ANALYSIS_RR_SPEC_IMAGE_X = 1290
     ANALYSIS_RR_SPEC_IMAGE_Y = 2090
     ANALYSIS_RR_SPEC_IMAGE_W = 810
@@ -383,7 +383,7 @@ class KoreanConstants(Constants):
         ('ALIGNMENT', (0, 0), (-1, -1), 'CENTER'),
     ]
 
-    ANALYSIS_POINCARE_IMAGE = './%s/poincare_plot.png'
+    ANALYSIS_POINCARE_IMAGE = './poincare_plot.png'
     ANALYSIS_POINCARE_IMAGE_X = 1070
     ANALYSIS_POINCARE_IMAGE_Y = 2790
     ANALYSIS_POINCARE_IMAGE_W = 510
@@ -396,7 +396,7 @@ class KoreanConstants(Constants):
     ANALYSIS_POINCARE_TEXT_Y = 2740
     ANALYSIS_POINCARE_TEXT_SIZE = 30
 
-    ANALYSIS_DFA_IMAGE = './%s/dfa.png'
+    ANALYSIS_DFA_IMAGE = './dfa.png'
     ANALYSIS_DFA_IMAGE_X = 1590
     ANALYSIS_DFA_IMAGE_Y = 2790
     ANALYSIS_DFA_IMAGE_W = 510

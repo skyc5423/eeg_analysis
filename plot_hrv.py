@@ -6,14 +6,12 @@ import os
 from scipy.signal import welch
 from matplotlib.patches import Ellipse
 from PIL import Image
+from pathlib import Path
 
 
 def plot_ecg(analysis_data, plot_feature, sample_rate, start_time, save_path, plot_time=30):
-    print('plot_ecg')
-    print(analysis_data.shape)
-    # for t in range(int(analysis_data.shape[0] / (250 * 30))):
-    if not os.path.exists('./%s' % save_path):
-        os.mkdir('./%s' % save_path)
+    save_path.mkdir(exist_ok=True, parents=True)
+
     fig, ax = plt.subplots(1, 1, figsize=(10, 1.5))
     ax.tick_params(
         axis='y',  # changes apply to the x-axis
@@ -32,36 +30,12 @@ def plot_ecg(analysis_data, plot_feature, sample_rate, start_time, save_path, pl
     ax.set_xlim(start_time, start_time + plot_time)
     plt.legend()
     plt.tight_layout()
-    fig.savefig('./%s/ecg.png' % save_path)
+    fig.savefig(save_path / Path('ecg.png'))
     plt.close(fig)
-
-    if False:  # for Debug
-        for t in range(9):
-            start_time_debug = t * 30
-            fig, ax = plt.subplots(1, 1, figsize=(10, 1.5))
-            ax.tick_params(
-                axis='y',  # changes apply to the x-axis
-                which='both',  # both major and minor ticks are affected
-                left=False,  # ticks along the bottom edge are off
-                right=False,  # ticks along the top edge are off
-                labelleft=False)
-            ax.set_xlabel('Time (s)', fontsize=11)
-            ax.set_ylim(np.min(analysis_data[start_time_debug * sample_rate:(start_time_debug + plot_time) * sample_rate]),
-                        np.max(analysis_data[start_time_debug * sample_rate:(start_time_debug + plot_time) * sample_rate]))
-            rr_list = plot_feature['peak_list']
-            # ax.set_title('ECG Time Series')
-            ax.plot(np.linspace(start_time_debug, start_time_debug + plot_time, plot_time * sample_rate),
-                    analysis_data[start_time_debug * sample_rate:(start_time_debug + plot_time) * sample_rate],
-                    linewidth=0.6, color='black')
-            ax.scatter(np.array(rr_list) / sample_rate, analysis_data[np.array(rr_list)], color='green', s=15)
-            ax.set_xlim(start_time_debug, start_time_debug + plot_time)
-            plt.legend()
-            plt.tight_layout()
-            fig.savefig('./%s/ecg_%d.png' % (save_path, t))
-            plt.close(fig)
 
 
 def plot_rr(t, rr, save_path):
+    save_path.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(1, 1, figsize=(10, 1.5))
     # ax.set_title('RR Time Series')
     ax.set_xlabel('Time (s)', fontsize=11)
@@ -70,11 +44,12 @@ def plot_rr(t, rr, save_path):
     ax.plot(t, rr / 1000, linewidth=0.6, color='blue')
     ax.set_xlim(t[0], t[-1])
     plt.tight_layout()
-    fig.savefig('./%s/rr.png' % save_path)
+    fig.savefig(save_path / Path('rr.png'))
     plt.close(fig)
 
 
 def plot_rr_hist(peak_list, mask_list, sample_rate, save_path):
+    save_path.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(1, 1, figsize=(3.6, 2.4))
     # ax.set_title('RR Time Series')
     ax.set_ylabel('# of beats', fontsize=11)
@@ -84,11 +59,12 @@ def plot_rr_hist(peak_list, mask_list, sample_rate, save_path):
 
     ax.hist(rr_array / sample_rate, color='blue', bins=19, rwidth=0.9)
     plt.tight_layout()
-    fig.savefig('./%s/rr_hist.png' % save_path)
+    fig.savefig(save_path / Path('rr_hist.png'))
     plt.close(fig)
 
 
 def plot_psd_rr(f, psd, save_path):
+    save_path.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(1, 1, figsize=(3.9, 2.6))
     ax.plot(np.array(f), np.array(psd), color='black')
     idx_vlf = np.where(f <= 0.045)[0]
@@ -102,11 +78,12 @@ def plot_psd_rr(f, psd, save_path):
     ax.set_xlabel('Frequency (Hz)', fontsize=11)
     ax.set_ylabel('PSD (s\u00b2/Hz)', fontsize=11)
     plt.tight_layout()
-    fig.savefig('./%s/psd.png' % save_path)
+    fig.savefig(save_path / Path('psd.png'))
     plt.close(fig)
 
 
 def plot_poincare(peak_list, mask_list, sample_rate, lagged, sd1, sd2, save_path):
+    save_path.mkdir(exist_ok=True, parents=True)
     rr_series = (np.array(peak_list)[1:] - np.array(peak_list)[:-1]) / sample_rate * 1000
     rr_series = np.delete(rr_series, np.where(mask_list)[0])
     # rr_series = np.array(peak_list)
@@ -138,7 +115,7 @@ def plot_poincare(peak_list, mask_list, sample_rate, lagged, sd1, sd2, save_path
     ax.set_xlabel('$RR_n$(ms)', fontsize=11)
     ax.set_ylabel('$RR_{n+1}$(ms)', fontsize=11)
     plt.tight_layout()
-    fig.savefig('./%s/poincare_plot.png' % (save_path))
+    fig.savefig(save_path / Path('poincare_plot.png'))
     plt.close(fig)
 
 
@@ -159,6 +136,7 @@ def plot_breathing_psd(b_psd, b_frq):
 
 
 def plot_dfa(scales, fluct, coeff_low, coeff_high, save_path):
+    save_path.mkdir(exist_ok=True, parents=True)
     fluctfit_low = 2 ** np.polyval(coeff_low, np.log2(scales[(scales < 16)]))
     fluctfit_high = 2 ** np.polyval(coeff_high, np.log2(scales[(scales > 16)]))
     fig, ax = plt.subplots(1, 1, figsize=(3., 3.))
@@ -168,7 +146,7 @@ def plot_dfa(scales, fluct, coeff_low, coeff_high, save_path):
     ax.set_xlabel(r'$\log_{10}$n(beats)', fontsize=11)
     ax.set_ylabel(r'$\log_{10}$F(n)', fontsize=11)
     plt.tight_layout()
-    fig.savefig('./%s/dfa.png' % save_path)
+    fig.savefig(save_path / Path('dfa.png'))
     plt.close(fig)
 
 
@@ -197,7 +175,8 @@ def draw_pentagon_graph(r_list, ax, edgecolor='gray', facecolor='white', alpha=1
 
 
 def plot_pentagon_chart(score, save_path):
-    font_prop = fm.FontProperties(fname='./font/NanumSquareBold.ttf', size=13)
+    save_path.mkdir(exist_ok=True, parents=True)
+    font_prop = fm.FontProperties(fname='./resource/font/NanumSquareBold.ttf', size=13)
 
     fig, ax = plt.subplots(1, 1, figsize=(4, 4))
     ax.set_xlim(-1.5, 1.5)
@@ -223,17 +202,18 @@ def plot_pentagon_chart(score, save_path):
     ax.text(-0.8, -1.28, score_text[2], horizontalalignment='center', verticalalignment='center', fontproperties=font_prop, color='#4475F3', alpha=0.75)
     ax.text(0.8, -1.28, score_text[3], horizontalalignment='center', verticalalignment='center', fontproperties=font_prop, color='#4475F3', alpha=0.75)
     ax.axis('off')
-    fig.savefig('./%s/pentagon_chart.png' % save_path)
+    fig.savefig(save_path / Path('pentagon_chart.png'))
     plt.close(fig)
 
 
 def plot_age_figure(real_age, hrv_age, save_path):
+    save_path.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(1, 1, figsize=(3, 3))
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
-    img_heart = Image.open('./img/heartbeat.jpg')
+    img_heart = Image.open('./resource/img/heartbeat.jpg')
     ax.imshow(np.array(img_heart), extent=(-1., 1., -0.5, 0.8), alpha=0.6)
-    img_human = Image.open('./img/human.png')
+    img_human = Image.open('./resource/img/human.png')
     ax.imshow(np.array(img_human), extent=(-0.5, 0.5, -1., 1.), alpha=0.15)
 
     ax.text(0, 0, str(hrv_age), fontsize=100, fontweight='extra bold', horizontalalignment='center', verticalalignment='center', color='#4475F3')
@@ -245,7 +225,7 @@ def plot_age_figure(real_age, hrv_age, save_path):
     ax.text(0, -1., 'It cannot be used for medical diagnosis', fontsize=10, horizontalalignment='center', verticalalignment='center', color='#44444466')
     ax.axis('off')
     plt.tight_layout()
-    fig.savefig('./%s/age_figure.png' % save_path)
+    fig.savefig(save_path / Path('age_figure.png'))
     plt.close(fig)
 
 
@@ -293,6 +273,7 @@ def get_norm(feature, feature_val, age_range):
 
 
 def plot_hrv_graph(feature, feature_value, age, save_path):
+    save_path.mkdir(exist_ok=True, parents=True)
     fig, ax = plt.subplots(1, 1, figsize=(4, 2.5))
     age_range = np.linspace(4, 85, 82)
     y_norm, y_label_axis = get_norm(feature, feature_value, age_range)
@@ -306,7 +287,7 @@ def plot_hrv_graph(feature, feature_value, age, save_path):
     ax.set_xlim(0, 90)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', alpha=0.2)
     plt.tight_layout()
-    fig.savefig('./%s/%s.png' % (save_path, feature))
+    fig.savefig(save_path / Path('%s.png' % feature))
     plt.close(fig)
     return y_norm[3][norm_age - 4]
 
@@ -322,8 +303,6 @@ def get_age(birthday):
 
 
 def plot_hrv_figure(analysis_data, sample_rate, plot_time, feature, plot_feature, info_crt, save_path):
-    print('plot_hrv')
-    print(analysis_data.shape)
     plot_ecg(analysis_data, plot_feature, sample_rate, plot_time, save_path)
     plot_rr(plot_feature['t'], plot_feature['rr'], save_path)
     plot_rr_hist(plot_feature['peak_list'], plot_feature['mask_peak_list'], sample_rate, save_path)

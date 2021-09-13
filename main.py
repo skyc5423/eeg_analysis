@@ -1,4 +1,6 @@
 import os
+
+import mne.io
 import numpy as np
 from file_io import read_file
 from request_example import TEST_INFO
@@ -16,6 +18,10 @@ import config.cfg as config
 from tqdm import tqdm
 from pathlib import Path
 from warnings import simplefilter
+import pyedflib
+from analysis_hrv import analysis_hrv
+from plot_hrv import plot_hrv_figure
+from y_report_hrv import YReportHRV
 
 
 def make_compare_analysis(crt_ytdf_file, crt_edf_data, info_crt, cmp_ytdf_file, cmp_edf_data, info_cmp, request_id, language='Korean', model=None):
@@ -163,6 +169,30 @@ def comp_analysis_eeg(info, crt_file_name, cmp_file_name, language='Korean', mod
                           info_crt=info, info_cmp=info, language=language, model=model)
 
 
+def indiv_analysis_ecg(info, crt_file_name, language, model):
+    info['anlzRequest']['id'] = crt_file_name.split('.')[0]
+    request_id = str(info["anlzRequest"]["id"])
+
+    if not cfg.DUPLICATE:
+        if Path(cfg.OUT_DIR, request_id).exists():
+            raise Exception('Already exists: %s' % (Path(cfg.OUT_DIR, request_id)))
+
+    raw = mne.io.read_raw_edf(crt_file_name)
+    data = raw.get_data()
+    if len(data.shape) == 2:
+        data = data[0]
+    fs = int(raw.info['sfreq'])
+    analysis_data, fs, feature, plot_feature = analysis_hrv(data, fs, birthday=info['subject']['birthday'], dummy_data=False, save_path=Path(cfg.OUT_DIR, request_id))
+    z_score_graph = plot_hrv_figure(analysis_data, fs, 0, feature, plot_feature, info, Path(cfg.OUT_DIR, request_id))
+    yr_hrv = YReportHRV(request_id, info, feature, z_score_graph)
+    yr_hrv.make_single_report_pdf()
+    return str(Path(cfg.OUT_DIR, request_id, 'y_report_hrv.pdf'))
+
+
+def analysis_ecg(info, crt_file_name, language='Korean', model=None):
+    indiv_analysis_ecg(info, crt_file_name, language, model)
+
+
 def analysis_eeg(info, crt_file_name, language='Korean', model=None):
     indiv_analysis_eeg(info, crt_file_name, language, model)
 
@@ -210,7 +240,12 @@ def main():
         for src_path in tqdm(parse_file_list(args.path)):
             try:
                 print("%s starts" % src_path)
-                analysis_eeg(TEST_INFO, src_path, language=cfg.LANGUAGE, model=tf_model.default())
+
+                reader = pyedflib.EdfReader(src_path)
+                if reader.getSignalLabels()[0] == 'ECG':
+                    analysis_ecg(TEST_INFO, src_path, language=cfg.LANGUAGE, model=tf_model.default())
+                else:
+                    analysis_eeg(TEST_INFO, src_path, language=cfg.LANGUAGE, model=tf_model.default())
             except Exception as instance:
                 inst_message = instance.args[0]
                 print("%s failed: %s" % (src_path, inst_message))
@@ -229,11 +264,12 @@ def main():
 if __name__ == '__main__':
     sys.argv = ['main.py',
                 '--mode', 'analysis',
-                '--path', 'testdata/0000-김나경/0000-김나경-20210315-094123.edf',
+                '--path', '0000-kim-hrv.edf',
                 'OUT_DIR', 'output',
                 'PREPROCESS', 'False',
                 'DUPLICATE', 'True',
-                'DEBUG_MODE', 'True']
+                'DEBUG_MODE', 'False']
+    # sys.argv = ['main.py', '--mode', 'analysis', '--path', 'testdata', 'OUT_DIR', 'output', 'PREPROCESS', 'True', 'DEBUG_MODE', 'False']
     # sys.argv = ['main.py', '--mode', 'compare', '--path', 'kim20210813-204049.edf', '--old_path', 'kim.edf', 'OUT_DIR', 'output', 'DEBUG_MODE',
     #             'True']
     main()

@@ -14,7 +14,9 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import Frame, Paragraph
 from reportlab.platypus.tables import Table
 import os
-from analysis.y_report_def_hrv_korea import KoreanConstants
+from y_report_def_hrv_korea import KoreanConstants
+from pathlib import Path
+from config.cfg import cfg
 
 
 class YReportHRV(object):
@@ -28,18 +30,20 @@ class YReportHRV(object):
         self.register_font()
         self.page_num = 1
 
-        self.c = canvas.Canvas(os.path.join(self.request_id, 'y_report_hrv.pdf'), pagesize=A4, bottomup=True)
+        self.path = Path(cfg.OUT_DIR, request_id)
+
+        self.c = canvas.Canvas(str(self.path / Path('y_report_hrv.pdf')), pagesize=A4, bottomup=True)
         self.c.setPageSize(A4)
 
     def register_font(self):
-        pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM, 'font/NanumSquareRegular.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_BOLD, 'font/NanumSquareBold.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_EX_BOLD, 'font/NanumSquareExtraBold.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL, 'font/arial.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_MT, 'font/arialmt.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_BLACK, 'font/arial-black.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN, 'font/times-new-roman.ttf'))
-        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN_ITALIC, 'font/times-new-roman-Italic.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM, './resource/font/NanumSquareRegular.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_BOLD, './resource/font/NanumSquareBold.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_NANUM_EX_BOLD, './resource/font/NanumSquareExtraBold.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL, './resource/font/arial.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_MT, './resource/font/arialmt.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_ARIAL_BLACK, './resource/font/arial-black.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN, './resource/font/times-new-roman.ttf'))
+        pdfmetrics.registerFont(TTFont(self.const.FONT_TIMES_NEW_ROMAN_ITALIC, './resource/font/times-new-roman-Italic.ttf'))
 
     def get_clr(self, str_color, alpha=1.0):
         r = int(str_color[1:3], 16)
@@ -270,7 +274,7 @@ class YReportHRV(object):
                        self.const.SUMMARY_HEALTH_TEXT_SIZE,
                        self.const.SUMMARY_HEALTH_TEXT_COLOR, self.const.SUMMARY_HEALTH_TEXT_TYPE)
 
-        self.make_img(self.const.SUMMARY_HEALTH_IMAGE % self.request_id, self.const.SUMMARY_HEALTH_IMAGE_X, self.const.SUMMARY_HEALTH_IMAGE_Y, self.const.SUMMARY_HEALTH_IMAGE_W,
+        self.make_img(self.path / Path(self.const.SUMMARY_HEALTH_IMAGE), self.const.SUMMARY_HEALTH_IMAGE_X, self.const.SUMMARY_HEALTH_IMAGE_Y, self.const.SUMMARY_HEALTH_IMAGE_W,
                       self.const.SUMMARY_HEALTH_IMAGE_H)
 
         # 신체 나이
@@ -280,7 +284,7 @@ class YReportHRV(object):
                        self.const.SUMMARY_AGE_TEXT_SIZE,
                        self.const.SUMMARY_AGE_TEXT_COLOR, self.const.SUMMARY_AGE_TEXT_TYPE)
 
-        self.make_img(self.const.SUMMARY_AGE_IMAGE % self.request_id, self.const.SUMMARY_AGE_IMAGE_X, self.const.SUMMARY_AGE_IMAGE_Y, self.const.SUMMARY_AGE_IMAGE_W,
+        self.make_img(self.path / Path(self.const.SUMMARY_AGE_IMAGE), self.const.SUMMARY_AGE_IMAGE_X, self.const.SUMMARY_AGE_IMAGE_Y, self.const.SUMMARY_AGE_IMAGE_W,
                       self.const.SUMMARY_AGE_IMAGE_H)
 
         # 심박변이도 분석 결과
@@ -298,7 +302,7 @@ class YReportHRV(object):
                                        np.where(np.array(score) < 0.3, '조금 낮음', np.where(np.array(score) < 0.7, '보통', np.where(np.array(score) < 0.9, '조금 높음', '매우 높음'))))
 
                 data_summary_feature = [['%s' % self.const.SUMMARY_FEATURE_TEXT_LIST[j][i], text_severe]]
-                data_summary_image = self.const.SUMMARY_FEATURE_IMAGE_LIST[j][i] % self.request_id
+                data_summary_image = self.path / Path(self.const.SUMMARY_FEATURE_IMAGE_LIST[j][i])
 
                 self.make_table(data_summary_feature,
                                 self.const.SUMMARY_FEATURE_TABLE_X + self.const.SUMMARY_FEATURE_TABLE_X_OFFSET * i,
@@ -333,14 +337,14 @@ class YReportHRV(object):
                        self.const.ANALYSIS_ECG_TEXT_SIZE,
                        self.const.ANALYSIS_ECG_TEXT_COLOR, self.const.ANALYSIS_ECG_TEXT_TYPE)
 
-        self.make_img(self.const.ANALYSIS_ECG_IMAGE % self.request_id, self.const.ANALYSIS_ECG_IMAGE_X, self.const.ANALYSIS_ECG_IMAGE_Y, self.const.ANALYSIS_ECG_IMAGE_W,
+        self.make_img(self.path / Path(self.const.ANALYSIS_ECG_IMAGE), self.const.ANALYSIS_ECG_IMAGE_X, self.const.ANALYSIS_ECG_IMAGE_Y, self.const.ANALYSIS_ECG_IMAGE_W,
                       self.const.ANALYSIS_ECG_IMAGE_H)
 
         self.make_text(self.const.ANALYSIS_RR_TEXT, self.const.ANALYSIS_RR_TEXT_X, self.const.ANALYSIS_RR_TEXT_Y,
                        self.const.ANALYSIS_RR_TEXT_SIZE,
                        self.const.ANALYSIS_RR_TEXT_COLOR, self.const.ANALYSIS_RR_TEXT_TYPE)
 
-        self.make_img(self.const.ANALYSIS_RR_IMAGE % self.request_id, self.const.ANALYSIS_RR_IMAGE_X, self.const.ANALYSIS_RR_IMAGE_Y, self.const.ANALYSIS_RR_IMAGE_W,
+        self.make_img(self.path / Path(self.const.ANALYSIS_RR_IMAGE), self.const.ANALYSIS_RR_IMAGE_X, self.const.ANALYSIS_RR_IMAGE_Y, self.const.ANALYSIS_RR_IMAGE_W,
                       self.const.ANALYSIS_RR_IMAGE_H)
 
         # Time Domain Results
@@ -365,7 +369,7 @@ class YReportHRV(object):
                         self.const.ANALYSIS_TIME_TABLE_H,
                         self.const.ANALYSIS_TIME_TABLE_STYLE)
 
-        self.make_img(self.const.ANALYSIS_RR_DIST_IMAGE % self.request_id, self.const.ANALYSIS_RR_DIST_IMAGE_X, self.const.ANALYSIS_RR_DIST_IMAGE_Y,
+        self.make_img(self.path / Path(self.const.ANALYSIS_RR_DIST_IMAGE), self.const.ANALYSIS_RR_DIST_IMAGE_X, self.const.ANALYSIS_RR_DIST_IMAGE_Y,
                       self.const.ANALYSIS_RR_DIST_IMAGE_W,
                       self.const.ANALYSIS_RR_DIST_IMAGE_H)
 
@@ -398,7 +402,7 @@ class YReportHRV(object):
         self.make_table(data_freq_domain, self.const.ANALYSIS_FREQUENCY_TABLE_X, self.const.ANALYSIS_FREQUENCY_TABLE_Y, self.const.ANALYSIS_FREQUENCY_TABLE_W,
                         self.const.ANALYSIS_FREQUENCY_TABLE_H, self.const.ANALYSIS_FREQUENCY_TABLE_STYLE)
 
-        self.make_img(self.const.ANALYSIS_RR_SPEC_IMAGE % self.request_id, self.const.ANALYSIS_RR_SPEC_IMAGE_X, self.const.ANALYSIS_RR_SPEC_IMAGE_Y,
+        self.make_img(self.path / Path(self.const.ANALYSIS_RR_SPEC_IMAGE), self.const.ANALYSIS_RR_SPEC_IMAGE_X, self.const.ANALYSIS_RR_SPEC_IMAGE_Y,
                       self.const.ANALYSIS_RR_SPEC_IMAGE_W, self.const.ANALYSIS_RR_SPEC_IMAGE_H)
 
         self.make_text(self.const.ANALYSIS_RR_SPEC_TEXT, self.const.ANALYSIS_RR_SPEC_TEXT_X, self.const.ANALYSIS_RR_SPEC_TEXT_Y, self.const.ANALYSIS_RR_SPEC_TEXT_SIZE,
@@ -426,7 +430,7 @@ class YReportHRV(object):
         self.make_table(data_nonlinear_domain, self.const.ANALYSIS_NONLINEAR_TABLE_X, self.const.ANALYSIS_NONLINEAR_TABLE_Y, self.const.ANALYSIS_NONLINEAR_TABLE_W,
                         self.const.ANALYSIS_NONLINEAR_TABLE_H, self.const.ANALYSIS_NONLINEAR_TABLE_STYLE)
 
-        self.make_img(self.const.ANALYSIS_POINCARE_IMAGE % self.request_id, self.const.ANALYSIS_POINCARE_IMAGE_X, self.const.ANALYSIS_POINCARE_IMAGE_Y,
+        self.make_img(self.path / Path(self.const.ANALYSIS_POINCARE_IMAGE), self.const.ANALYSIS_POINCARE_IMAGE_X, self.const.ANALYSIS_POINCARE_IMAGE_Y,
                       self.const.ANALYSIS_POINCARE_IMAGE_W,
                       self.const.ANALYSIS_POINCARE_IMAGE_H)
 
@@ -434,7 +438,7 @@ class YReportHRV(object):
                        self.const.ANALYSIS_POINCARE_TEXT_SIZE,
                        self.const.ANALYSIS_POINCARE_TEXT_COLOR, self.const.ANALYSIS_POINCARE_TEXT_TYPE)
 
-        self.make_img(self.const.ANALYSIS_DFA_IMAGE % self.request_id, self.const.ANALYSIS_DFA_IMAGE_X, self.const.ANALYSIS_DFA_IMAGE_Y, self.const.ANALYSIS_DFA_IMAGE_W,
+        self.make_img(self.path / Path(self.const.ANALYSIS_DFA_IMAGE), self.const.ANALYSIS_DFA_IMAGE_X, self.const.ANALYSIS_DFA_IMAGE_Y, self.const.ANALYSIS_DFA_IMAGE_W,
                       self.const.ANALYSIS_DFA_IMAGE_H)
 
         self.make_text(self.const.ANALYSIS_DFA_TEXT, self.const.ANALYSIS_DFA_TEXT_X, self.const.ANALYSIS_DFA_TEXT_Y,

@@ -9,6 +9,7 @@ from scipy.signal import welch, butter, filtfilt, lfilter, iirnotch
 from scipy.stats import norm
 from scipy.interpolate import interp1d
 from pyentrp import entropy as ent
+import datetime
 
 
 def get_samp_entropy_nd_arr_tmp(data, fs, time_window=5, m_0=1, r=0.25):
@@ -322,15 +323,19 @@ def summary_percentile(stress_val, balance_val, energy_val, recovery_val, age):
     return stress_score, balance_score, energy_score, heart_score, recovery_score, age_score
 
 
-def analysis_hrv(analysis_data, sample_rate, total_time, birthday, dummy_data=False, save_path=None):
-    def get_age(birthday):
-        import datetime
+def analysis_hrv(analysis_data, sample_rate, birthday, dummy_data=False, save_path=None):
+
+    def get_age(birthday: str):
         now = datetime.datetime.now()
-        if not isinstance(birthday, int):
-            year, _, _ = birthday.split('-')
+        if isinstance(birthday, int):
+            birth_year, birth_month, birth_day = birthday / 10000, birthday % 10000 / 100, birthday % 10000 % 100
+        elif isinstance(birthday, str):
+            birthday = int(birthday)
+            birth_year, birth_month, birth_day = birthday / 10000, birthday % 10000 / 100, birthday % 10000 % 100
         else:
-            year = birthday / 10000
-        return now.year - int(year) + 1
+            raise RuntimeError('Not supported type for birthday:' + str(type(birthday)))
+        age = now.year - birth_year + 1
+        return int(age)
 
     if not dummy_data:
         try:
@@ -410,8 +415,6 @@ def analysis_hrv(analysis_data, sample_rate, total_time, birthday, dummy_data=Fa
             'fluct': fluct,
         }
 
-        print('return')
-        print(filtered_data.shape)
         return filtered_data, sample_rate, feature, plot_feature
     else:
         feature = {
@@ -606,8 +609,6 @@ def analysis_ecg_v2(data, fs=250):
 
 
 def get_peak_custom(data, sample_rate, save_path=None):
-    print('get_peak_custom')
-    print(data.shape)
     b, a = iirnotch(125, 30, 500)
     data = np.array(lfilter(b, a, data[:]))
     f1 = 5 / sample_rate
@@ -691,19 +692,16 @@ def get_peak_custom(data, sample_rate, save_path=None):
     #     fig.savefig('./filter_%d.png' % t)
     #     plt.close(fig)
 
-    plot_time = 1000
+    # plot_time = 1000
+    # if save_path is not None:
+    #     for t in range(20):
+    #         fig, ax = plt.subplots(3, 1, figsize=(18, 8))
+    #         ax[0].plot(filtered_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='black')
+    #         ax[1].plot(diff_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='black')
+    #         ax[2].plot(sqr_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='black')
+    #         ax[2].plot(ma_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='blue')
+    #         ax[2].plot(ma_data2[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='red')
+    #         fig.savefig('./%s/tmp_%d.png' % (save_path, t))
+    #         plt.close(fig)
 
-    if save_path is not None:
-        for t in range(20):
-            fig, ax = plt.subplots(3, 1, figsize=(18, 8))
-            ax[0].plot(filtered_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='black')
-            ax[1].plot(diff_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='black')
-            ax[2].plot(sqr_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='black')
-            ax[2].plot(ma_data[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='blue')
-            ax[2].plot(ma_data2[plot_time * t:plot_time * (t + 1)], linewidth=0.5, color='red')
-            fig.savefig('./%s/tmp_%d.png' % (save_path, t))
-            plt.close(fig)
-
-    print('get_peak_custom')
-    print(filtered_data.shape)
     return rtn_peak_list, filtered_data
