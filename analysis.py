@@ -807,7 +807,7 @@ def make_analysis(art_removed_custom_raw, request_id, crt_prefix, age, language=
     return cdf_dict, raw_data_dict
 
 
-def make_analysis_fake():
+def make_analysis_fake(request_id, crt_prefix, age, language='Korean', ):
     cdf_dict = {}
     for feature in ['abs_power', 'rel_power']:
         tmp = {}
@@ -820,7 +820,20 @@ def make_analysis_fake():
             tmp[band] = np.load('./reference_files/fake_data/%s_%s.npy' % (feature, band))
         cdf_dict[feature] = tmp
     for feature in ['stress', 'cognition', 'concentration', 'use_of_brain', 'memory_operate', 'info_amount', 'info_speed', 'info_complex', 'connectivity']:
-        cdf_dict[feature] = np.random.random()
+        cdf_dict[feature] = np.random.random() / 10. + 0.9
+
+    cdf_dict['cognition'] = 0.95
+    for feature in ['stress', 'concentration', 'cognition']:
+        type_idx(cdf_dict[feature], feature, request_id, crt_prefix, language=language)
+
+    use_of_brain(cdf_dict['use_of_brain'], request_id, crt_prefix, language=language)
+    memory_operate(cdf_dict['memory_operate'], request_id, crt_prefix, language=language)
+
+    info_amount_complexity(cdf_dict['info_amount'], cdf_dict['info_complex'], request_id, crt_prefix,
+                           language=language)
+    information_speed(cdf_dict['info_speed'], request_id, crt_prefix, language=language)
+    hemispheric_connectivity(cdf_dict['connectivity'], request_id, crt_prefix, language=language)
+
     return cdf_dict, None
 
 

@@ -774,19 +774,19 @@ class YReportAnalysis(YReport):
 
         self.c.showPage()
         self.set_template()
-        data_patient_1 = [[self.const.COVER_NAME_TEXT, subject['name']],
-                          ['ID', subject['id']],
-                          [self.const.COVER_AGE_TEXT, subject['age']]]
-        data_patient_2 = [[self.const.COVER_GENDER_TEXT, subject['gender']],
-                          [self.const.COVER_HAND_TEXT, subject['handedness']],
-                          [self.const.COVER_DATE_TEXT, subject['created']]]
-
-        self.make_table(data_patient_1, self.const.SUM_PAT_INFO_TABLE_X, self.const.SUM_PAT_INFO_TABLE_Y + 25, self.const.SUM_PAT_INFO_TABLE_W, self.const.SUM_PAT_INFO_TABLE_H,
-                        self.const.SUM_PAT_INFO_TABLE_STYLE)
-        self.make_table(data_patient_2, self.const.SUM_PAT_INFO_TABLE_X + self.const.SUM_PAT_INFO_TABLE_W[0] + self.const.SUM_PAT_INFO_TABLE_W[1] + 10,
-                        self.const.SUM_PAT_INFO_TABLE_Y + 25, self.const.SUM_PAT_INFO_TABLE_W,
-                        self.const.SUM_PAT_INFO_TABLE_H,
-                        self.const.SUM_PAT_INFO_TABLE_STYLE)
+        # data_patient_1 = [[self.const.COVER_NAME_TEXT, subject['name']],
+        #                   ['ID', subject['id']],
+        #                   [self.const.COVER_AGE_TEXT, subject['age']]]
+        # data_patient_2 = [[self.const.COVER_GENDER_TEXT, subject['gender']],
+        #                   [self.const.COVER_HAND_TEXT, subject['handedness']],
+        #                   [self.const.COVER_DATE_TEXT, subject['created']]]
+        #
+        # self.make_table(data_patient_1, self.coㄹnst.SUM_PAT_INFO_TABLE_X, self.const.SUM_PAT_INFO_TABLE_Y + 25, self.const.SUM_PAT_INFO_TABLE_W, self.const.SUM_PAT_INFO_TABLE_H,
+        #                 self.const.SUM_PAT_INFO_TABLE_STYLE)
+        # self.make_table(data_patient_2, self.const.SUM_PAT_INFO_TABLE_X + self.const.SUM_PAT_INFO_TABLE_W[0] + self.const.SUM_PAT_INFO_TABLE_W[1] + 10,
+        #                 self.const.SUM_PAT_INFO_TABLE_Y + 25, self.const.SUM_PAT_INFO_TABLE_W,
+        #                 self.const.SUM_PAT_INFO_TABLE_H,
+        #                 self.const.SUM_PAT_INFO_TABLE_STYLE)
 
         self.make_text('SCAN Report Summary', self.const.FUN_TITLE_TEXT_X, self.const.FUN_TITLE_TEXT_Y, self.const.FUN_TITLE_TEXT_SIZE, self.const.FUN_TITLE_TEXT_COLOR,
                        self.const.FONT_ARIAL_MT)
@@ -827,7 +827,7 @@ class YReportAnalysis(YReport):
                       self.const.Y_LIM * 0.12)
         self.make_text(self.const.INFO_CONNECTIVITY_TEXT, self.const.X_LIM * 0.674, self.const.Y_LIM * 0.684, 35, self.const.FUN_OVERALL_TEXT_COLOR, self.const.IDX_FONT)
 
-        self.make_text(self.const.FUN_DESC_TEXT, self.const.FEATURE_DESC_TEXT_X, self.const.Y_LIM * 0.87, self.const.FEATURE_DESC_TEXT_SIZE,
+        self.make_text(self.const.FUN_DESC_TEXT, self.const.FEATURE_DESC_TEXT_X, self.const.Y_LIM * 0.145, self.const.FEATURE_DESC_TEXT_SIZE,
                        self.const.FEATURE_DESC_TEXT_COLOR, self.const.FEATURE_DESC_TEXT_TYPE, w=self.const.FEATURE_DESC_TEXT_W)
 
     def functional_abnormal_desc_table(self, cdf_dict):
@@ -843,6 +843,41 @@ class YReportAnalysis(YReport):
                        self.const.FONT_ARIAL_MT)
 
         data_table_1 = [[self.const.FEATURE_TEXT, self.const.DESCRIPTION_TEXT, self.const.RESULT_TEXT]]
+
+        if cdf_dict['stress'] < 0.1:
+            cdf_dict['stress'] = 0.1
+        elif cdf_dict['stress'] > 0.9:
+            cdf_dict['stress'] = 0.9
+
+        if cdf_dict['concentration'] < 0.1:
+            cdf_dict['concentration'] = 0.1
+        elif cdf_dict['concentration'] > 0.9:
+            cdf_dict['concentration'] = 0.9
+
+        if cdf_dict['cognition'] < 0.1:
+            cdf_dict['cognition'] = 0.1
+        elif cdf_dict['cognition'] > 0.9:
+            cdf_dict['cognition'] = 0.9
+
+        if cdf_dict['use_of_brain'] < 0.1:
+            cdf_dict['use_of_brain'] = 0.1
+        elif cdf_dict['use_of_brain'] > 0.9:
+            cdf_dict['use_of_brain'] = 0.9
+
+        if cdf_dict['info_complex'] < 0.1:
+            cdf_dict['info_complex'] = 0.1
+        elif cdf_dict['info_complex'] > 0.9:
+            cdf_dict['info_complex'] = 0.9
+
+        if cdf_dict['info_speed'] < 0.1:
+            cdf_dict['info_speed'] = 0.1
+        elif cdf_dict['info_speed'] > 0.9:
+            cdf_dict['info_speed'] = 0.9
+
+        if cdf_dict['connectivity'] < 0.1:
+            cdf_dict['connectivity'] = 0.1
+        elif cdf_dict['connectivity'] > 0.9:
+            cdf_dict['connectivity'] = 0.9
 
         data_table_1.append([self.const.TEXT_STRESS_IDX, self.const.TEXT_STRESS_DESC_TABLE, self.const.PERCENTAGE_TEXT % int(100 * cdf_dict['stress'])])
         data_table_1.append([self.const.TEXT_CONCENTRATION_IDX, self.const.TEXT_CONCENTRATION_DESC_TABLE, self.const.PERCENTAGE_TEXT % int(100 * cdf_dict['concentration'])])

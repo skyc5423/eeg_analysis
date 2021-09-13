@@ -166,6 +166,11 @@ def information_speed(score, request_id, crt_prefix, language='Korean'):
         slow_text = 'slow'
         fast_text = 'fast'
 
+    if score < 0.1:
+        score = 0.09
+    elif score > 0.9:
+        score = 0.91
+
     if score < 0.2:
         portion_bar = score * 5.
         sizes = [portion_bar, 1 - portion_bar, 1, 1, 1, 1, 5]
@@ -199,13 +204,15 @@ def information_speed(score, request_id, crt_prefix, language='Korean'):
 
     circle = plt.Circle((0, 0), 2 / 3, color='white')
     ax.add_artist(circle)
-
-    if int(score * 100) > 9:
-        ax.text(-0.3, 0, '%d' % int(score * 100), fontsize=40, fontweight=545)
+    if score < 0.1:
+        ax.text(-0.3, 0, '%d' % 10, fontsize=40, fontweight=545)
+        ax.text(0.14, 0, '% 미만', fontsize=20, color='#b5b5bc', fontweight=545, fontproperties=fontprop)
+    elif score > 0.9:
+        ax.text(-0.3, 0, '%d' % 90, fontsize=40, fontweight=545)
+        ax.text(0.14, 0, '% 초과', fontsize=20, color='#b5b5bc', fontweight=545, fontproperties=fontprop)
     else:
-        ax.text(-0.14, 0, '%d' % int(score * 100), fontsize=40, fontweight=545)
-
-    ax.text(0.14, 0, '%', fontsize=20, color='#b5b5bc', fontweight=545)
+        ax.text(-0.3, 0, '%d' % int(score * 100), fontsize=40, fontweight=545)
+        ax.text(0.14, 0, '%', fontsize=20, color='#b5b5bc', fontweight=545)
 
     ax.text(-0.85, -0.12, slow_text, fontproperties=fontprop, color='#000000', verticalalignment='center',
             horizontalalignment='center', fontsize=12)
@@ -250,6 +257,10 @@ def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, la
         fontprop = fm.FontProperties(fname=font_location)
         complexity_text = '複雑度'
 
+    if score_complex < 0.1:
+        score_complex = 0.09
+    elif score_complex > 0.9:
+        score_complex = 0.91
     fig, ax = plt.subplots(1, 1, figsize=(6, 4.5))
     ax.grid(color='#eaeaea', linestyle='--', axis='x', dashes=(8, 8))
     # ax.barh([1.04, 0], [score_info * 100, score_complex * 100], height=[0.8, 0.8], color=['#639ce7', '#6dc6bd'])
@@ -278,13 +289,20 @@ def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, la
     x_coord_complex = np.min([np.max([25, score_complex * 100 + 5]), 82])
 
     if int(score_complex * 100) < 10:
-        x_percent_coord_offset_complex = 1
+        x_percent_coord_offset_complex = 2
     elif int(score_complex * 100) > 99:
-        x_percent_coord_offset_complex = 3
+        x_percent_coord_offset_complex = 2
     else:
         x_percent_coord_offset_complex = 2
-
-    if score_complex < 0.2:
+    if score_complex < 0.1:
+        ax.text(5, 0, complexity_text, fontproperties=fontprop, color='#000000', verticalalignment='center',
+                fontsize=18)
+        ax.text(x_coord_complex, 0, '%d' % 10, fontproperties=fontprop, color='#000000',
+                verticalalignment='center', horizontalalignment='left',
+                fontsize=20)
+        ax.text(x_coord_complex + 4 * x_percent_coord_offset_complex, 0, '% 미만', fontsize=15, color='#b5b5bc',
+                verticalalignment='center', horizontalalignment='left', fontweight=545, fontproperties=fontprop)
+    elif score_complex < 0.2:
         ax.text(5, 0, complexity_text, fontproperties=fontprop, color='#000000', verticalalignment='center',
                 fontsize=18)
         ax.text(x_coord_complex, 0, '%d' % int(score_complex * 100), fontproperties=fontprop, color='#000000',
@@ -295,11 +313,11 @@ def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, la
     elif score_complex > 0.9:
         ax.text(5, 0, complexity_text, fontproperties=fontprop, color='#ffffff', verticalalignment='center',
                 fontsize=18)
-        ax.text(x_coord_complex, 0, '%d' % int(score_complex * 100), fontproperties=fontprop, color='#ffffff',
+        ax.text(x_coord_complex, 0, '%d' % 90, fontproperties=fontprop, color='#ffffff',
                 verticalalignment='center', horizontalalignment='left',
                 fontsize=20)
-        ax.text(x_coord_complex + 4 * x_percent_coord_offset_complex, 0, '%', fontsize=15, color='#eaeaea',
-                verticalalignment='center', horizontalalignment='left', fontweight=545)
+        ax.text(x_coord_complex + 4 * x_percent_coord_offset_complex, 0, '% 초과', fontsize=15, color='#eaeaea',
+                verticalalignment='center', horizontalalignment='left', fontweight=545, fontproperties=fontprop)
     else:
         ax.text(5, 0, complexity_text, fontproperties=fontprop, color='#ffffff', verticalalignment='center',
                 fontsize=18)
@@ -317,7 +335,10 @@ def info_amount_complexity(score_info, score_complex, request_id, crt_prefix, la
     plt.close(fig)
 
 
-def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix):
+def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix, language='Korean'):
+    if language == 'Korean':
+        font_location = './resource/font/NanumSquareBold.ttf'
+        fontprop = fm.FontProperties(fname=font_location)
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
     im1 = Image.open('resource/img/brain-top-outline.png')
@@ -327,12 +348,17 @@ def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix):
     im1 = np.array(im1)
     im2 = np.array(im2)
 
+    if score_hemis_con < 0.1:
+        score_hemis_con = 0.09
+    elif score_hemis_con > 0.9:
+        score_hemis_con = 0.91
+
     im2[:int(im2.shape[0] * (1 - score_hemis_con))] = 1.
 
     if int(score_hemis_con * 100) < 10:
-        x_percent_coord_offset = 1
+        x_percent_coord_offset = 2
     elif int(score_hemis_con * 100) > 99:
-        x_percent_coord_offset = 3
+        x_percent_coord_offset = 2
     else:
         x_percent_coord_offset = 2
 
@@ -340,8 +366,15 @@ def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix):
     ax.axis('off')
     ax.imshow(im2, origin='lower')
     ax.imshow(im1)
-    ax.text(350, 80, '%d' % int(score_hemis_con * 100), fontsize=30)
-    ax.text(350 + x_percent_coord_offset * 40, 78, '%', fontsize=20, color='#b5b5bc')
+    if score_hemis_con < 0.1:
+        ax.text(350, 80, '%d' % 10, fontsize=30)
+        ax.text(350 + x_percent_coord_offset * 40, 78, '% 미만', fontsize=20, color='#b5b5bc', fontproperties=fontprop)
+    elif score_hemis_con > 0.9:
+        ax.text(350, 80, '%d' % 90, fontsize=30)
+        ax.text(350 + x_percent_coord_offset * 40, 78, '% 초과', fontsize=20, color='#b5b5bc', fontproperties=fontprop)
+    else:
+        ax.text(350, 80, '%d' % int(score_hemis_con * 100), fontsize=30)
+        ax.text(350 + x_percent_coord_offset * 40, 78, '%', fontsize=20, color='#b5b5bc')
 
     ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
@@ -353,7 +386,11 @@ def hemispheric_connectivity(score_hemis_con, request_id, crt_prefix):
     plt.close(fig)
 
 
-def use_of_brain(score_brain_use, request_id, crt_prefix):
+def use_of_brain(score_brain_use, request_id, crt_prefix, language='Korean'):
+    if language == 'Korean':
+        font_location = './resource/font/NanumSquareBold.ttf'
+        fontprop = fm.FontProperties(fname=font_location)
+
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
 
@@ -364,12 +401,17 @@ def use_of_brain(score_brain_use, request_id, crt_prefix):
     im1 = np.array(im1)
     im2 = np.array(im2)
 
+    if score_brain_use < 0.1:
+        score_brain_use = 0.09
+    elif score_brain_use > 0.9:
+        score_brain_use = 0.91
+
     im2[:int(im2.shape[0] * (1 - score_brain_use))] = 1.
 
     if int(score_brain_use * 100) < 10:
-        x_percent_coord_offset = 1
+        x_percent_coord_offset = 2
     elif int(score_brain_use * 100) > 99:
-        x_percent_coord_offset = 3
+        x_percent_coord_offset = 2
     else:
         x_percent_coord_offset = 2
 
@@ -377,8 +419,15 @@ def use_of_brain(score_brain_use, request_id, crt_prefix):
     ax.axis('off')
     ax.imshow(im2, origin='lower')
     ax.imshow(im1)
-    ax.text(440, 80, '%d' % int(score_brain_use * 100), fontsize=30)
-    ax.text(440 + x_percent_coord_offset * 45, 78, '%', fontsize=20, color='#b5b5bc')
+    if score_brain_use < 0.1:
+        ax.text(440, 80, '%d' % 10, fontsize=30)
+        ax.text(440 + x_percent_coord_offset * 45, 78, '% 미만', fontsize=20, color='#b5b5bc', fontproperties=fontprop)
+    elif score_brain_use > 0.9:
+        ax.text(440, 80, '%d' % 90, fontsize=30)
+        ax.text(440 + x_percent_coord_offset * 45, 78, '% 초과', fontsize=20, color='#b5b5bc', fontproperties=fontprop)
+    else:
+        ax.text(440, 80, '%d' % int(score_brain_use * 100), fontsize=30)
+        ax.text(440 + x_percent_coord_offset * 45, 78, '%', fontsize=20, color='#b5b5bc')
 
     ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
@@ -407,7 +456,7 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
                          'concentration': '집중도',
                          'cognition': '인지능력'}
 
-        idx_desc_text = '%s 지수가 백분위 %d%% 수준입니다.'
+        idx_desc_text = '%s 지수가 백분위 %d%%%s 수준입니다.'
 
     else:
         font_location = './resource/font/KosugiMaru-Regular.ttf'
@@ -431,22 +480,24 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
     fig, ax = plt.subplots(1, 1, figsize=(8, 2))
 
     if int(idx_score * 100) < 10:
-        x_percent_coord_offset_info = 1
+        x_percent_coord_offset_info = 2
     elif int(idx_score * 100) > 99:
-        x_percent_coord_offset_info = 3
+        x_percent_coord_offset_info = 2
     else:
         x_percent_coord_offset_info = 2
 
     if idx_score < 0.1:
         level_idx = 0
+        idx_score = 0.09
     elif idx_score < 0.3:
         level_idx = 1
     elif idx_score < 0.7:
         level_idx = 2
-    elif idx_score < 0.9:
-        level_idx = 3
-    else:
+    elif idx_score > 0.9:
         level_idx = 4
+        idx_score = 0.91
+    else:
+        level_idx = 3
 
     ax.barh(0.1, 1., height=0.3, color='#eaeaea')
 
@@ -459,15 +510,38 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
     ax.set_ylim(-1, 1)
     ax.axis('off')
 
-    ax.text(0, 0.6, idx_desc_text % (key_text_dict[index_type], int(100 * idx_score)), fontproperties=fontprop,
-            color='#576881', verticalalignment='center',
-            fontsize=13)
+    if idx_score < 0.1:
+        ax.text(0, 0.6, idx_desc_text % (key_text_dict[index_type], 10, '미만'), fontproperties=fontprop,
+                color='#576881', verticalalignment='center',
+                fontsize=13)
 
-    ax.text(0.8, 0.65, '%d' % int(100 * idx_score), color='#000000', verticalalignment='center',
-            horizontalalignment='left', fontsize=24)
+        ax.text(0.8, 0.65, 10, color='#000000', verticalalignment='center',
+                horizontalalignment='left', fontsize=24)
 
-    ax.text(0.8 + x_percent_coord_offset_info * 0.038, 0.6, '%', fontproperties=fontprop, color='#b5b5bc',
-            verticalalignment='center', fontsize=15)
+        ax.text(0.8 + x_percent_coord_offset_info * 0.038, 0.6, '% 미만', fontproperties=fontprop, color='#b5b5bc',
+                verticalalignment='center', fontsize=15)
+
+    elif idx_score > 0.9:
+        ax.text(0, 0.6, idx_desc_text % (key_text_dict[index_type], 90, '초과'), fontproperties=fontprop,
+                color='#576881', verticalalignment='center',
+                fontsize=13)
+
+        ax.text(0.8, 0.65, 90, color='#000000', verticalalignment='center',
+                horizontalalignment='left', fontsize=24)
+
+        ax.text(0.8 + x_percent_coord_offset_info * 0.038, 0.6, '% 초과', fontproperties=fontprop, color='#b5b5bc',
+                verticalalignment='center', fontsize=15)
+
+    else:
+        ax.text(0, 0.6, idx_desc_text % (key_text_dict[index_type], int(100 * idx_score), ''), fontproperties=fontprop,
+                color='#576881', verticalalignment='center',
+                fontsize=13)
+
+        ax.text(0.8, 0.65, '%d' % int(100 * idx_score), color='#000000', verticalalignment='center',
+                horizontalalignment='left', fontsize=24)
+
+        ax.text(0.8 + x_percent_coord_offset_info * 0.038, 0.6, '%', fontproperties=fontprop, color='#b5b5bc',
+                verticalalignment='center', fontsize=15)
 
     for i in range(level_define_var.__len__()):
         if i == level_idx:
@@ -490,7 +564,10 @@ def type_idx(idx_score, index_type, request_id, crt_prefix, language='Korean'):
     plt.close(fig)
 
 
-def memory_operate(alpha_score, request_id, crt_prefix):
+def memory_operate(alpha_score, request_id, crt_prefix, language='Korean'):
+    if language == 'Korean':
+        font_location = './resource/font/NanumSquareBold.ttf'
+        fontprop = fm.FontProperties(fname=font_location)
     path_fig = Path(cfg.OUT_DIR, request_id)
     path_fig.mkdir(exist_ok=True, parents=True)
     font_location = './resource/font/NanumSquareBold.ttf'

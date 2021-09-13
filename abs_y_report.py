@@ -509,6 +509,20 @@ class YReport(metaclass=ABCMeta):
         self.make_text(self.const.COVER_YB_INFO_TEXT, self.const.COVER_YB_INFO_X, self.const.COVER_YB_INFO_Y, self.const.COVER_YB_INFO_SIZE, self.const.COVER_YB_INFO_COLOR,
                        self.const.COVER_YB_INFO_TYPE, self.const.COVER_YB_INFO_ALPHA)
         self.make_backgnd(self.const.COVER_REC_3_X, self.const.COVER_REC_3_Y, self.const.COVER_REC_3_W, self.const.COVER_REC_3_H, self.const.COVER_REC_3_COLOR)
+
+        data_patient_1 = [[self.const.COVER_NAME_TEXT, subject['name']],
+                          ['ID', subject['id']],
+                          [self.const.COVER_AGE_TEXT, subject['age']]]
+        data_patient_2 = [[self.const.COVER_GENDER_TEXT, subject['gender']],
+                          [self.const.COVER_HAND_TEXT, subject['handedness']],
+                          [self.const.COVER_DATE_TEXT, subject['created']]]
+
+        self.make_table(data_patient_1, self.const.SUM_PAT_INFO_TABLE_X, self.const.SUM_PAT_INFO_TABLE_Y + 25, self.const.SUM_PAT_INFO_TABLE_W, self.const.SUM_PAT_INFO_TABLE_H,
+                        self.const.SUM_PAT_INFO_TABLE_STYLE)
+        self.make_table(data_patient_2, self.const.SUM_PAT_INFO_TABLE_X + self.const.SUM_PAT_INFO_TABLE_W[0] + self.const.SUM_PAT_INFO_TABLE_W[1] + 10,
+                        self.const.SUM_PAT_INFO_TABLE_Y + 25, self.const.SUM_PAT_INFO_TABLE_W,
+                        self.const.SUM_PAT_INFO_TABLE_H,
+                        self.const.SUM_PAT_INFO_TABLE_STYLE)
         return
 
     def appendix_page(self):

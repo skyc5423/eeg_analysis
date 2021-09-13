@@ -54,9 +54,9 @@ def make_compare_report(request_id, info_crt, info_cmp, crt_cdf_dict, cmp_cdf_di
     yr = YReportCompare(request_id, info_crt, info_cmp, language='Korean')
 
     yr.make_compare_report_pdf(cover_page=for_eeg, functional_abnormal_page=for_eeg, power_page=for_eeg,
-                              psd_ch_page=for_eeg, alpha_peak_page=for_eeg, connectivity_page=for_eeg,
-                              reference_page=for_eeg, appendix_page=appendix_page,
-                              appendix_feature_page=for_eeg, crt_cdf_dict=crt_cdf_dict, cmp_cdf_dict=cmp_cdf_dict)
+                               psd_ch_page=for_eeg, alpha_peak_page=for_eeg, connectivity_page=for_eeg,
+                               reference_page=for_eeg, appendix_page=appendix_page,
+                               appendix_feature_page=for_eeg, crt_cdf_dict=crt_cdf_dict, cmp_cdf_dict=cmp_cdf_dict)
     return yr.path
 
 
@@ -78,7 +78,10 @@ def make_single_analysis(crt_ytdf_file, crt_edf_data, request_id, info_crt, lang
                                                     language=language,
                                                     age=age)
         else:
-            cdf_dict, raw_data_dict = make_analysis_fake()
+            cdf_dict, raw_data_dict = make_analysis_fake(request_id=request_id,
+                                                         crt_prefix='crt',
+                                                         language=language,
+                                                         age=age)
 
     return make_indiv_report(request_id, info_crt, language=language, for_eeg=for_eeg, cdf_dict=cdf_dict,
                              raw_data_dict=raw_data_dict)
@@ -224,7 +227,13 @@ def main():
 
 
 if __name__ == '__main__':
-    # sys.argv = ['main.py', '--mode', 'analysis', '--path', 'testdata', 'OUT_DIR', 'output', 'PREPROCESS', 'True', 'DEBUG_MODE', 'False']
-    sys.argv = ['main.py', '--mode', 'compare', '--path', 'kim20210813-204049.edf', '--old_path', 'kim.edf', 'OUT_DIR', 'output', 'DEBUG_MODE',
-                'True']
+    sys.argv = ['main.py',
+                '--mode', 'analysis',
+                '--path', 'testdata/0000-김나경/0000-김나경-20210315-094123.edf',
+                'OUT_DIR', 'output',
+                'PREPROCESS', 'False',
+                'DUPLICATE', 'True',
+                'DEBUG_MODE', 'True']
+    # sys.argv = ['main.py', '--mode', 'compare', '--path', 'kim20210813-204049.edf', '--old_path', 'kim.edf', 'OUT_DIR', 'output', 'DEBUG_MODE',
+    #             'True']
     main()
