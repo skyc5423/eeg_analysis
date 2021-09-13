@@ -10,6 +10,8 @@ from scipy.stats import norm
 from scipy.interpolate import interp1d
 from pyentrp import entropy as ent
 import datetime
+from config.cfg import cfg
+from file_io import write_excel_hrv
 
 
 def get_samp_entropy_nd_arr_tmp(data, fs, time_window=5, m_0=1, r=0.25):
@@ -414,6 +416,9 @@ def analysis_hrv(analysis_data, sample_rate, birthday, dummy_data=False, save_pa
             'scales': scales,
             'fluct': fluct,
         }
+
+        if cfg.FEATURE:
+            write_excel_hrv(feature, save_path)
 
         return filtered_data, sample_rate, feature, plot_feature
     else:

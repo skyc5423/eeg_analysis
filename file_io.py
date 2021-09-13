@@ -305,3 +305,28 @@ def write_excel(cdf_dict, raw_dict, f, psd, request_id):
     path_csv = Path(cfg.OUT_DIR, request_id)
     path_csv.mkdir(exist_ok=True, parents=True)
     write_wb.save(path_csv / Path('feature_val.xlsx'))
+
+
+def write_excel_hrv(feature_dict, save_path):
+    write_wb = Workbook()
+    write_ws = write_wb.create_sheet('feature')
+
+    feature_list = list(feature_dict.keys())
+    write_ws.append(feature_list)
+    feature_value_list = []
+    feature_value_list_2 = []
+    for feature in feature_list:
+        if feature == 'sa_en':
+            feature_value_list.append(feature_dict[feature][0])
+            feature_value_list_2.append('')
+        elif feature in ['coeff_low', 'coeff_high']:
+            feature_value_list.append(feature_dict[feature][0])
+            feature_value_list_2.append(feature_dict[feature][1])
+        else:
+            feature_value_list.append(feature_dict[feature])
+            feature_value_list_2.append('')
+    write_ws.append(feature_value_list)
+    write_ws.append(feature_value_list_2)
+    write_wb.remove_sheet(write_wb['Sheet'])
+    save_path.mkdir(exist_ok=True, parents=True)
+    write_wb.save(save_path / Path('feature_val.xlsx'))
