@@ -111,7 +111,10 @@ def make_indiv_report(request_id, info, cdf_dict, raw_data_dict, language='Korea
 
 
 def indiv_analysis_eeg(info, crt_file_name, language='Korean', model=None):
-    info['anlzRequest']['id'] = crt_file_name.split('.')[0]
+    if len(crt_file_name.split('.')) == 2:
+        info['anlzRequest']['id'] = crt_file_name.split('.')[0]
+    else:
+        info['anlzRequest']['id'] = crt_file_name.split('.')[1]
     request_id = str(info["anlzRequest"]["id"])
 
     if not cfg.DUPLICATE:
@@ -170,7 +173,10 @@ def comp_analysis_eeg(info, crt_file_name, cmp_file_name, language='Korean', mod
 
 
 def indiv_analysis_ecg(info, crt_file_name, language, model):
-    info['anlzRequest']['id'] = crt_file_name.split('.')[0]
+    if len(crt_file_name.split('.')) == 2:
+        info['anlzRequest']['id'] = crt_file_name.split('.')[0]
+    else:
+        info['anlzRequest']['id'] = crt_file_name.split('.')[1]
     request_id = str(info["anlzRequest"]["id"])
 
     if not cfg.DUPLICATE:
