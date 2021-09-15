@@ -44,8 +44,14 @@ def make_compare_analysis(crt_ytdf_file, crt_edf_data, info_crt, cmp_ytdf_file, 
 
         make_cmp_analysis(pre_art_removed_custom_raw, pst_art_removed_custom_raw, request_id, 'diff')
     else:
-        cmp_cdf_dict, raw_data_dict = make_analysis_fake()
-        crt_cdf_dict, raw_data_dict = make_analysis_fake()
+        cmp_cdf_dict, raw_data_dict = make_analysis_fake(request_id=request_id,
+                                                         crt_prefix='cmp',
+                                                         language=language,
+                                                         age=age)
+        crt_cdf_dict, raw_data_dict = make_analysis_fake(request_id=request_id,
+                                                         crt_prefix='crt',
+                                                         language=language,
+                                                         age=age)
 
     return make_compare_report(request_id, info_crt, info_cmp, language=language, crt_cdf_dict=crt_cdf_dict,
                                cmp_cdf_dict=cmp_cdf_dict)
