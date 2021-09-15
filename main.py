@@ -240,9 +240,9 @@ def main():
         for src_path in tqdm(parse_file_list(args.path)):
             try:
                 print("%s starts" % src_path)
-
                 reader = pyedflib.EdfReader(src_path)
                 if reader.getSignalLabels()[0] == 'ECG':
+                    # continue
                     analysis_ecg(TEST_INFO, src_path, language=cfg.LANGUAGE, model=tf_model.default())
                 else:
                     analysis_eeg(TEST_INFO, src_path, language=cfg.LANGUAGE, model=tf_model.default())
@@ -262,13 +262,14 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.argv = ['main.py',
-                '--mode', 'analysis',
-                '--path', '0000-kim-hrv.edf',
-                'OUT_DIR', 'output',
-                'PREPROCESS', 'False',
-                'DUPLICATE', 'True',
-                'DEBUG_MODE', 'False']
+    # sys.argv = ['main.py',
+    #             '--mode', 'analysis',
+    #             '--path', 'testdata/ad',
+    #             'OUT_DIR', 'output',
+    #             'FEATURE', 'True',
+    #             'PREPROCESS', 'False',
+    #             'DUPLICATE', 'True',
+    #             'DEBUG_MODE', 'False']
     # sys.argv = ['main.py', '--mode', 'analysis', '--path', 'testdata', 'OUT_DIR', 'output', 'PREPROCESS', 'True', 'DEBUG_MODE', 'False']
     # sys.argv = ['main.py', '--mode', 'compare', '--path', 'kim20210813-204049.edf', '--old_path', 'kim.edf', 'OUT_DIR', 'output', 'DEBUG_MODE',
     #             'True']

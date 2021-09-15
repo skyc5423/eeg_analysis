@@ -329,4 +329,4 @@ def write_excel_hrv(feature_dict, save_path):
     write_ws.append(feature_value_list_2)
     write_wb.remove_sheet(write_wb['Sheet'])
     save_path.mkdir(exist_ok=True, parents=True)
-    write_wb.save(save_path / Path('feature_val.xlsx'))
+    write_wb.save(save_path / Path('feature_val_hrv.xlsx'))
