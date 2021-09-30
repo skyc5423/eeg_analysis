@@ -26,6 +26,8 @@ python main.py 를 통해 실행
 --DEBUG_MODE boolean : report 등의 UI 작업 시에 빠른 debugging을 위한 debug mode로 실행할 것인지 말 것인지를 결정 (TRUE: debug mode, FALSE: general mode)
 
 
+* HRV feature 분석도 가능합니다. 개별 분석만 가능하며 위와 동일하게 사용하되 edf 파일 내부에 채널 정보가 ecg로 labelling 되어 있으면 자동으로 HRV 분석으로 진행됩니다.
+
 EX) 
 1. ./sample_data 폴더에 있는 모든 edf 파일을 분석하고 전처리된 뇌파를 저장하고 파워 피쳐만 저장한다. 그리고 report는 생성하지 않고 결과물은 ./out_sample_data에 저장한다
    python main.py --mode analysis --path ./sample_data --OUT_DIR ./out_sample_data --FEATURE True --ONLY_FEATURE True --REPORT False --PREPROCESS True
